@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     # nevergrad does not seem to like solutions of variable size. 
     # If we use it, all tests must start the same length
-    solution = ng.p.Array(shape=(5,), lower=1, upper=50).set_integer_casting()
+    solution = ng.p.Array(shape=(5,), lower=1, upper=40).set_integer_casting()
 
     optimizer = ng.optimizers.NGOpt(parametrization=solution, budget=100)
     recommendation = optimizer.minimize(calculateFitness)
