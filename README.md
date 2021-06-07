@@ -2,7 +2,7 @@
 A simple unit test generator for Python
 
 # Installation 
-Run `pip install requirements.txt` in your local terminal.
+Run `pip install -r requirements.txt` and `pip3 install -r requirements.txt` in your local terminal.
 
 # Execution
-Simply run `python randomTestGenerator.py` or `python3 randomTestGenerator.py`
+Simply run `python3 randomTestGenerator.py`.
