@@ -21,7 +21,7 @@ class BMICalc:
         if age < 2:
             print("This calculator is not valid for children under 2 years old.")
             return
-        if not (gender == '0' or gender == '1'):
+        if not (gender == 0 or gender == 1):
             print("Gender must be '0' for 'female', or '1' for male.")
             return
             
@@ -42,7 +42,7 @@ class BMICalc:
 
     
     def classifyBMI_teensAndChildren(self):
-        if not (gender == '0' or gender == '1'):
+        if not (gender == 0 or gender == 1):
             print("Gender must be '0' for 'female', or '1' for male.")
             return
         if (self.age < 2 and self.age > 19):
