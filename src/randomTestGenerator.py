@@ -1,3 +1,4 @@
+import simpleBMI
 import os
 from xml.dom import minidom
 import random
@@ -5,8 +6,7 @@ import string
 
 def selectAction(x):
     if x==1:
-        gender = random.choice(charOptions)
-        f.write("\ta.gender = \'%c\' \n" % gender[0])
+        f.write("\ta.gender = \'%d\' \n" % random.randint(-1,2))
     if x==2:
         f.write("\ta.height = %d.0 \n" % random.randint(-99,999))
     if x==3:
@@ -27,14 +27,12 @@ f= open("test_simpleBMI.py","w+") #overwrites the old file with this name
 f.write("import simpleBMI\nimport pytest\n\n")
 
 nTestsCases = random.randint(1,20)
-charOptions = ['f','F','m','M', random.choice(string.ascii_letters)]
 
 for i in range(nTestsCases):
     
     #INSTANTIATE AN OBJECT
     f.write("def test_%d():\n" % i)
-    gender = random.choice(charOptions)
-    f.write("\tgender = \'%c\' \n" % gender[0])
+    f.write("\tgender = \'%d\' \n" % random.randint(-1,2))
     f.write("\theight = %d.0 \n" % random.randint(-99,999))
     f.write("\tweight = %d.0 \n" % random.randint(-99,999))
     f.write("\tage = %d \n" % random.randint(-99,999))
