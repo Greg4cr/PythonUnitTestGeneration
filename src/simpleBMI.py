@@ -21,8 +21,8 @@ class BMICalc:
         if age < 2:
             print("This calculator is not valid for children under 2 years old.")
             return
-        if not (gender == 'f' or gender == 'F' or gender == 'm' or gender == 'M'):
-            print("Gender must be 'f' or 'F' for 'female', and 'm' or 'M' for male.")
+        if not (gender == '0' or gender == '1'):
+            print("Gender must be '0' for 'female', or '1' for male.")
             return
             
             
@@ -36,13 +36,15 @@ class BMICalc:
         if self.weight <= 0:
             print("Weight can not be zero or a negative number.")
             return
-        BMI = weight / ((height/100) * (height/100))
+        BMI = (weight*1.0) / (((height*1.0)/100) * ((height*1.0)/100))
         #print(f"You BMI is {BMI}")
         return BMI
 
     
     def classifyBMI_teensAndChildren(self):
-
+        if not (gender == '0' or gender == '1'):
+            print("Gender must be '0' for 'female', or '1' for male.")
+            return
         if (self.age < 2 and self.age > 19):
             print("The method classifyBMI_teensAndChildren only works for persons between the ages of 2 and 19. Try classifyBMI_adults instead.")
             return
@@ -53,7 +55,7 @@ class BMICalc:
             print("Weight can not be zero or a negative number.")
             return
         BMI = self.calculateBMI(self.height, self.weight)
-        if (self.gender == 'f' or self.gender == 'F'): #values are an approximation of values from this table: https://www.obesityaction.org/get-educated/understanding-childhood-obesity/what-is-childhood-obesity/girls-bmi-for-age-percentile-chart/
+        if (self.gender == 0): #values are an approximation of values from this table: https://www.obesityaction.org/get-educated/understanding-childhood-obesity/what-is-childhood-obesity/girls-bmi-for-age-percentile-chart/
             if self.age <=4:
                 if BMI <= 14:
                     return ("You are underweight.")
@@ -114,7 +116,7 @@ class BMICalc:
                 else:
                     return ("You are obese.")
 
-        if (self.gender == 'm' or self.gender == 'M'): #values are an approximation of values from this table: https://www.obesityaction.org/get-educated/understanding-childhood-obesity/what-is-childhood-obesity/boys-bmi-chart/
+        if (self.gender == 1): #values are an approximation of values from this table: https://www.obesityaction.org/get-educated/understanding-childhood-obesity/what-is-childhood-obesity/boys-bmi-chart/
             if self.age <=4:
                 if BMI <= 14.5:
                     return ("You are underweight.")
@@ -212,7 +214,7 @@ if __name__ == "__main__":
     height=180.0 #in cm
     weight=90.0 #in kg
     age=33 #years
-    gender='M' #expects ['m','M','f','F']
+    gender=1 #expects 1 for male or 0 for female
     
     person1 = BMICalc(height, weight, age, gender)
     print("PERSON 1")
@@ -221,7 +223,7 @@ if __name__ == "__main__":
     height=60.0  #in cm
     weight=13.0  #in kg
     age=3 #years
-    gender='f' #expects ['m','M','f','F']
+    gender=0 #expects 1 for male or 0 for female
     
     person2 = BMICalc(height, weight, age, gender)
     print("PERSON 2")
