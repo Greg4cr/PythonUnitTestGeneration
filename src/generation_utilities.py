@@ -26,8 +26,17 @@ def generateTestCase(metadata, maxActions):
 # Generates a constructor call
 # Picks a random constructor and generates random (integer) input for that constructor
 def generateConstructor(metadata):
-    which_constructor = random.randint(0, len(metadata["constructors"]) - 1)
-    parameter_data = metadata["constructors"][which_constructor]["parameters"]
+
+    # If there are no constructors, or if it has no parameters, create an empty parameter list
+    if "constructors" not in metadata.keys() or len(metadata["constructors"]) == 0:
+        parameter_data = []
+    else:
+        which_constructor = random.randint(0, len(metadata["constructors"]) - 1)
+    
+        if "parameters" in metadata["constructors"][which_constructor].keys():
+            parameter_data = metadata["constructors"][which_constructor]["parameters"]
+        else:
+            parameter_data= []
 
     parameters = []
 
@@ -50,7 +59,11 @@ def generateConstructor(metadata):
 # Selects a random action, then generates random (integer) input for that action
 def generateAction(metadata):
     which_action = random.randint(0, len(metadata["actions"]) - 1)
-    parameter_data = metadata["actions"][which_action]["parameters"]
+ 
+    if "parameters" in metadata["actions"][which_action].keys():
+        parameter_data = metadata["actions"][which_action]["parameters"]
+    else:
+        parameter_data= []
 
     parameters = []
 

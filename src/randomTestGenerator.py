@@ -6,29 +6,6 @@ import string
 from file_utilities import *
 from generation_utilities import *
 
-###### Import metadata
-
-metadata = parseMetadata('BMICalc_metadata.json')
-
-# For each constructor, note number of parameters.
-# All parameters are assumed to be integers
-
-# Actions
-# Format is [name of action, type of action (assign, method), number of parameters
-# All parameters are assumed to be integers
-actions = [['gender', 'assign', 1], ['height', 'assign', 1], ['weight', 'assign', 1], ['age', 'assign', 1], ['calculateBMI', 'method', 2], ['classifyBMI_teensAndChildren', 'method', 0], ['classifyBMI_adults', 'method', 0]]
-
-''' Example test case:
-[
-[0, [1]],
-[1, [5]],
-[4, [6,7]],
-[6, []]
-]
-Each step is [ index in action list , [ parameter values] ]
-'''
-
-
 ##### Prints genotype to a file (pytest code) and measures code coverage
 #TODO: GET COVERAGE VALUE FROM SCRIPT INSTEAD OF A XML FILE ---- Some times this process bugs when in a loop.
 #temporary workaround: Delay between creating and reading the XML file
@@ -95,24 +72,18 @@ def addRandomAction(test_suite):
 def changeRandomParameter(test_suite, increment):
     nTestCases = len(test_suite) - 1
     testCaseSelected = random.randint(0,nTestCases)
-    #print("test selected = %d" % testCaseSelected)
     nActions = len(test_suite[testCaseSelected]) - 1
     actionSelected = random.randint(0,(nActions))
-    #print("actionSelected = %d" % actionSelected)
-    #print(test_suite[testCaseSelected][actionSelected])
 
+    # Constructor
     if  test_suite[testCaseSelected][actionSelected][0] == -1:
         nParameters = len(test_suite[testCaseSelected][actionSelected][1]) - 1
-        #print("nParameters = %d" % nParameters)
         parmeterSelected = random.randint(0,nParameters)
-        #print("parmeterSelected = %d" % parmeterSelected)
-        #print(test_suite[testCaseSelected][actionSelected][1][parmeterSelected])
         test_suite[testCaseSelected][actionSelected][1][parmeterSelected] = test_suite[testCaseSelected][actionSelected][1][parmeterSelected] + increment
-    elif actions[test_suite[testCaseSelected][actionSelected][0]][2] > 0:
+    # Action
+    elif "parameters" in metadata["actions"][test_suite[testCaseSelected][actionSelected][0]] and len(metadata["actions"][test_suite[testCaseSelected][actionSelected][0]]["parameters"]) > 0:
         nParameters = len(test_suite[testCaseSelected][actionSelected][1]) - 1
         parmeterSelected = random.randint(0,nParameters)
-        #print(parmeterSelected)
-        #print(test_suite[testCaseSelected][actionSelected][1][parmeterSelected])
         test_suite[testCaseSelected][actionSelected][1][parmeterSelected] = test_suite[testCaseSelected][actionSelected][1][parmeterSelected] + increment
     return test_suite
 
@@ -160,8 +131,12 @@ def mutate(test_suite, action):
         test_suite = removeTestCase(test_suite)
     return test_suite
 
-
+###################################################################
 #Hill Climbing, using random ascent
+###################################################################
+
+# Import metadata
+metadata = parseMetadata('BMICalc_metadata.json')
 
 maxTestsCases = 20
 maxActions = 20

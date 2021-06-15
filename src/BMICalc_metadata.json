@@ -84,13 +84,11 @@
         },
         {
             "name": "classifyBMI_teensAndChildren",
-            "type": "method",
-            "parameters": []
+            "type": "method"
         },
         {
             "name": "classifyBMI_adults",
-            "type": "method",
-            "parameters": []
+            "type": "method"
         }
     ]
 }
