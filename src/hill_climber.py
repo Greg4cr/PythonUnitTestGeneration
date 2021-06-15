@@ -137,7 +137,7 @@ def mutate(solution):
 ###################################################################
 
 # Import metadata
-metadata = parseMetadata('BMICalc_metadata.json')
+metadata = parseMetadata('example/BMICalc_metadata.json')
 
 maxTestsCases = 20
 maxActions = 20

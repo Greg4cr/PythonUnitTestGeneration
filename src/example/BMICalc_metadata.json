@@ -1,5 +1,6 @@
 {
     "file": "simpleBMI",
+    "location": "example/",
     "class": "BMICalc",
     "constructor": 
      { 

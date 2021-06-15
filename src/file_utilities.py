@@ -17,7 +17,7 @@ def parseMetadata(filename):
 
 # Prints genotype representation to a file (pytest code)
 def writeToFile(metadata, test_suite):
-    outfile = 'test_' + metadata["file"] + '.py'
+    outfile = metadata["location"] + 'test_' + metadata["file"] + '.py'
     f= open(outfile,"w+") #overwrites the old file with this name
     f.write('import ' + metadata["file"] + '\nimport pytest\n')
 
