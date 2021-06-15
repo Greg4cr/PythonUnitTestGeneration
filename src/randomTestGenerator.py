@@ -3,15 +3,16 @@ import os
 from xml.dom import minidom
 import random
 import string
+import copy
+import time
 from file_utilities import *
 from generation_utilities import *
 
 ##### Prints genotype to a file (pytest code) and measures code coverage
 #TODO: GET COVERAGE VALUE FROM SCRIPT INSTEAD OF A XML FILE ---- Some times this process bugs when in a loop.
 #temporary workaround: Delay between creating and reading the XML file
-import time
-def getCoverage(test_suite):
-    writeToFile(metadata, test_suite)
+def getCoverage(solution):
+    writeToFile(metadata, solution.test_suite)
     os.system('pytest --cov=' + metadata["file"] + ' --cov-report term-missing --cov-report xml')
     #time.sleep(0.05*len(test_suite))
     try:
@@ -28,18 +29,18 @@ def getCoverage(test_suite):
             tag = xmldoc.getElementsByTagName('coverage')
     return (tag[0].attributes['line-rate'].value)
 
-
 #ADDED A SMALL PENALTY FOR NUMBER OF TEST CASES USED. 
-def fitness(test_suite):
+def calculateFitness(solution):
     #fitness = coverage percentage - a small penalty for the number of tests
-    a =  float(getCoverage(test_suite))
-    b = float(len(test_suite))/10
-    return a*100 - b
+    a = float(getCoverage(solution))
+    b = float(len(solution.test_suite))/10
+    solution.fitness = a*100 - b
+
+###################################################################
+# Mutation functions, used in the hill climber to manipulate solutions
+###################################################################
 
 '''
-Action library:
-actions = [['gender', 'assign', 1], ['height', 'assign', 1], ['weight', 'assign', 1], ['age', 'assign', 1], ['calculateBMI', 'method', 2], ['classifyBMI_teensAndChildren', 'method', 0], ['classifyBMI_adults', 'method', 0]]
-
 Example test case:
 [
 [0, [1]],
@@ -48,6 +49,8 @@ Example test case:
 [6, []]
 ]
 Each step is [ index in action list , [ parameter values] ]
+
+Actions are stored in the metadata dictionary at metadata["actions"][index]. 
 
 Example test suite:
 [[[-1, [642, 626, 53, -38]], [1, [612]], [4, [958, 46]]], [[-1, [257, 679, 337, 821]], [1, [74]], [0, [24]]], [[-1, [161, 409, 468, 675]], [1, [173]], [3, [926]]], [[-1, [870, -82, 949, 676]], [6, []], [4, [632, -88]]], [[-1, [235, 392, 366, 929]], [6, []], [6, []]], [[-1, [809, 508, 353, 706]], [6, []], [2, [72]]], [[-1, [276, 328, 691, -63]], [1, [538]], [3, [625]]], [[-1, [654, 69, 549, -1]], [3, [40]], [3, [741]]], [[-1, [147, 678, 485, 535]], [3, [321]], [6, []]], [[-1, [325, 291, 940, 169]], [6, []], [3, [484]]], [[-1, [745, 278, 232, 909]], [5, []], [0, [403]]], [[-1, [162, 993, 315, 186]], [4, [26, 980]], [1, [498]]], [[-1, [-95, 493, 68, 655]], [4, [881, 146]], [1, [295]]]]
@@ -144,13 +147,14 @@ maxActions = 20
 # Generate an initial solution.
 # This is a random test suite (1-20 tests), each with 1-20 actions
 
-solution_current = generateTestSuite(metadata,maxTestsCases, maxActions)
-fitness_current = fitness(solution_current)
-solution_best = solution_current
-fitness_best = fitness_current
-solution_soft = solution_current
+solution_current = Solution()
+solution_current.test_suite = generateTestSuite(metadata,maxTestsCases, maxActions)
+calculateFitness(solution_current)
 
-print('Initial fitness: ' + str(fitness_current))
+solution_best = copy.deepcopy(solution_current)
+solution_soft = copy.deepcopy(solution_current)
+
+print('Initial fitness: ' + str(solution_current.fitness))
 
 gen = 1
 maxGen = 0
@@ -192,6 +196,7 @@ while (gen < maxGen):
     # Increment generation
     gen += 1
 
-print("Best Test Suite: %d" %solution_best)
-print("Best Fitness: %d" %fitness_best)
-print("Number of generations used: %d" %gen)        
+print("Best Test Suite:")
+print(solution_best.test_suite)
+print("Best Fitness: " + str(solution_best.fitness))
+print("Number of generations used: " + str(gen))

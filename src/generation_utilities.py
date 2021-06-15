@@ -1,5 +1,10 @@
 import random
 
+# Class that represents a solution. Contains a test suite and a fitness score
+class Solution:
+    test_suite = []
+    fitness = -1
+
 # Generates a test suite, containing between 1 and "max" test cases
 # Each test case will contain 1 - "max" actions.
 def generateTestSuite(metadata, maxTestsCases, maxActions):
