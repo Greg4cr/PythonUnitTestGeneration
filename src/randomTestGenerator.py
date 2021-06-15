@@ -8,11 +8,6 @@ from utilities import *
 ###### Import metadata
 
 metadata = parseMetadata('BMICalc_metadata.json')
-print(metadata)
-print(metadata["actions"][0])
-
-file = 'simpleBMI'
-cut = 'BMICalc'
 
 # For each constructor, note number of parameters.
 # All parameters are assumed to be integers
@@ -38,12 +33,23 @@ Each step is [ index in action list , [ parameter values] ]
 # Generates a constructor call
 # Picks a random constructor and generates random (integer) input for that constructor
 def generateConstructor():
-    which_constructor = random.randint(0, len(inits) - 1)
-    num_parameters = inits[which_constructor]
+    which_constructor = random.randint(0, len(metadata["constructors"]) - 1)
+    parameter_data = metadata["constructors"][which_constructor]["parameters"]
+
     parameters = []
 
-    for parameter in range(num_parameters):
-        parameters.append(random.randint(-99,999))
+    for parameter in range(len(parameter_data)):
+        if "min" in parameter_data[parameter]:
+            min = parameter_data[parameter]["min"]
+        else:
+            min = -999
+
+        if "max" in parameter_data[parameter]:
+            max = parameter_data[parameter]["max"]
+        else:
+            max = 999
+
+        parameters.append(random.randint(min, max))
    
     return [-1, parameters]
    
@@ -64,10 +70,9 @@ def generateAction():
 # Prints genotype representation to a file (pytest code)
 
 def writeToFile(test_suite):
-    #CREATE AND SAVE A TEST CASE PYTHON FILE
-    outfile = 'test_' + file + '.py'
+    outfile = 'test_' + metadata["file"] + '.py'
     f= open(outfile,"w+") #overwrites the old file with this name
-    f.write('import ' + file + '\nimport pytest\n')
+    f.write('import ' + metadata["file"] + '\nimport pytest\n')
 
     for test in range(len(test_suite)):
         test_case = test_suite[test]
@@ -75,7 +80,7 @@ def writeToFile(test_suite):
 
         # Initialize the constructor
         parameters = test_case[0][1]
-        init_string = '\tcut = ' + file + '.' + cut + '(' + str(parameters[0])
+        init_string = '\tcut = ' + metadata["file"] + '.' + metadata["class"] + '(' + str(parameters[0])
         for parameter in range(1, len(parameters)):
             init_string = init_string + ',' + str(parameters[parameter])
 
@@ -105,7 +110,7 @@ def writeToFile(test_suite):
 
             f.write(out_string)
    
-    f.close() #changes are only saved after closed
+    f.close() 
 
 
 
@@ -115,7 +120,7 @@ def writeToFile(test_suite):
 import time
 def getCoverage(test_suite):
     writeToFile(test_suite)
-    os.system('pytest --cov=' + file + ' --cov-report term-missing --cov-report xml')
+    os.system('pytest --cov=' + metadata["file"] + ' --cov-report term-missing --cov-report xml')
     #time.sleep(0.05*len(test_suite))
     try:
         xmldoc = minidom.parse('coverage.xml')
