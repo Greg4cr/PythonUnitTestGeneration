@@ -3,7 +3,7 @@ import os
 from xml.dom import minidom
 import random
 import string
-from utilities import *
+from file_utilities import *
 
 ###### Import metadata
 
@@ -56,12 +56,23 @@ def generateConstructor():
 # Generate a random action on the CUT
 # Selects a random action, then generates random (integer) input for that action
 def generateAction():
-    which_action = random.randint(0, len(actions) - 1)
-    num_parameters = actions[which_action][2]
+    which_action = random.randint(0, len(metadata["actions"]) - 1)
+    parameter_data = metadata["actions"][which_action]["parameters"]
+
     parameters = []
 
-    for parameter in range(num_parameters):
-        parameters.append(random.randint(-99,999))
+    for parameter in range(len(parameter_data)):
+        if "min" in parameter_data[parameter]:
+            min = parameter_data[parameter]["min"]
+        else:
+            min = -999
+
+        if "max" in parameter_data[parameter]:
+            max = parameter_data[parameter]["max"]
+        else:
+            max = 999
+
+        parameters.append(random.randint(min, max))
    
     action = [which_action, parameters]
 
