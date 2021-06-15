@@ -1,4 +1,4 @@
-import os
+import subprocess
 from xml.dom import minidom
 import random
 import string
@@ -7,33 +7,28 @@ import time
 from file_utilities import *
 from generation_utilities import *
 
-##### Prints genotype to a file (pytest code) and measures code coverage
-#TODO: GET COVERAGE VALUE FROM SCRIPT INSTEAD OF A XML FILE ---- Some times this process bugs when in a loop.
-#temporary workaround: Delay between creating and reading the XML file
+##### Measures statement coverage
 def getCoverage(solution):
+    fitness = 0.0
     writeToFile(metadata, solution.test_suite)
-    os.system('pytest --cov=' + metadata["file"] + ' --cov-report term-missing --cov-report xml')
-    #time.sleep(0.05*len(test_suite))
-    try:
-        xmldoc = minidom.parse('coverage.xml')
-        tag = xmldoc.getElementsByTagName('coverage')
-    except:
-        time.sleep(0.05*len(test_suite))
-        try:
-            xmldoc = minidom.parse('coverage.xml')
-            tag = xmldoc.getElementsByTagName('coverage')
-        except:
-            time.sleep(0.2)
-            xmldoc = minidom.parse('coverage.xml')
-            tag = xmldoc.getElementsByTagName('coverage')
-    return (tag[0].attributes['line-rate'].value)
+    process = subprocess.Popen(['pytest', '--cov=' + metadata["file"]], stdout=subprocess.PIPE)
+    stdout = str(process.communicate()[0])
+    lines = stdout.split("\\n")
+    for line in lines:
+        # Line we want starts with TOTAL
+        if "TOTAL" in line:
+            words = line.split(" ")
+            coverage = words[len(words)-1]
+            fitness = coverage[:len(coverage)-1]
+
+    return fitness
 
 #ADDED A SMALL PENALTY FOR NUMBER OF TEST CASES USED. 
 def calculateFitness(solution):
     #fitness = coverage percentage - a small penalty for the number of tests
     a = float(getCoverage(solution))
     b = float(len(solution.test_suite))/10
-    solution.fitness = a*100 - b
+    solution.fitness = a - b
 
 ###################################################################
 # Mutation functions, used in the hill climber to manipulate solutions
@@ -149,43 +144,33 @@ solution_current.test_suite = generateTestSuite(metadata,maxTestsCases, maxActio
 calculateFitness(solution_current)
 
 solution_best = copy.deepcopy(solution_current)
-solution_soft = copy.deepcopy(solution_current)
 
 print('Initial fitness: ' + str(solution_current.fitness))
 
 gen = 1
-maxGen = 2
-nSoftResets = 0
+maxGen = 50
 
 while (gen < maxGen): 
-    tries = 30
+    tries = 50
     changed = False
-    #SHOULD WE KEEP MUTATING THE MUTATED VERSION INSTEAD OF THE BEST? --------------------
+
     for i in range(tries):
         solution_new = mutate(solution_current)
         calculateFitness(solution_new)
-        print(solution_new.fitness)
-        solution_current = copy.deepcopy(solution_new)
-        
-        if solution_new.fitness > solution_best.fitness:
+
+        if solution_new.fitness > solution_current.fitness:
+            print("New fitness: " + str(solution_new.fitness))
+            solution_current = copy.deepcopy(solution_new)
             changed = True
-            solution_best = copy.deepcopy(solution_current)
-            fitness_best = solution_new.fitness
-    
-    #Because we keep mutating the mutated version, solution_current might get to an irreversible state. I thought of a way to make a "soft" and a "hard" reset. 
-    if not changed:
-        if nSoftResets < 10:
-            #get solution_current to what it was before mutating
-            solution_current = copy.deepcopy(solution_soft)
-            nSoftResets = nSoftResets + 1
-        else:
-            #if 3 soft resets doesn't work, time to generate a completely new solution_current
-            maxTestsCases = 20
-            maxActions = 20
-            solution_current = Solution()
-            solution_current.test_suite = generateTestSuite(metadata, maxTestsCases, maxActions)
-            solution_soft = copy.deepcopy(solution_current)
-            nSoftResets = 0
+       
+            if solution_new.fitness > solution_best.fitness:
+                solution_best = copy.deepcopy(solution_current)
+
+    # Reset the search if no better mutant is found within 50 attempts.
+    if changed == False:
+        solution_current = Solution()
+        solution_current.test_suite = generateTestSuite(metadata, maxTestsCases, maxActions)
+        calculateFitness(solution_current)
 
     # Increment generation
     gen += 1
