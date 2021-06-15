@@ -68,8 +68,7 @@ def deleteRandomAction(test_suite):
 def addRandomAction(test_suite):
     nTestCases = len(test_suite) - 1
     testSelected = random.randint(0,nTestCases)
-    #print(testSelected)
-    test_suite[testSelected].append(generateAction())
+    test_suite[testSelected].append(generateAction(metadata))
     return test_suite
     
 def changeRandomParameter(test_suite, increment):
@@ -103,7 +102,7 @@ def removeTestCase(test_suite):
         test_suite.remove(test_suite[testCaseSelected])
     return test_suite
 
-def mutate(test_suite, action):
+def mutate(solution):
     '''
     Mutation - constrain possible actions - Pick one test case, make one change to actions in that test case:
         — Add an action
@@ -112,27 +111,27 @@ def mutate(test_suite, action):
         — Add a new test case with a constructor
         — Remove a test case
     '''
-    
-    try:
-        assert action > 0 and action < 7
-    except:
-        raise RuntimeError('Function mutate receives two parameters. mutate(test_suite, action). Where action must be an integer from 1 to 6.')
+
+    new_solution = Solution()
+    suite = copy.deepcopy(solution.test_suite)
+    action = random.randint(1,6)
         
     #SHOULD WE DELETE AND ADD TEST CASES INSTEAD OF ACTIONS? -------
     
     if action == 1: #1 delete an action
-        test_suite = deleteRandomAction(test_suite)
+        new_solution.test_suite = deleteRandomAction(suite)
     elif action == 2: #add an action
-        test_suite = addRandomAction(test_suite)
+        new_solution.test_suite = addRandomAction(suite)
     elif action == 3: #change random parameter - increment by 1
-        test_suite = changeRandomParameter(test_suite, 1)    
+        new_solution.test_suite = changeRandomParameter(suite, 1)    
     elif action == 4: #change random parameter - decrement by 1
-        test_suite = changeRandomParameter(test_suite, -1)
+        new_solution.test_suite = changeRandomParameter(suite, -1)
     elif action == 5: #add a test case
-        test_suite = addTestCase(test_suite)
+        new_solution.test_suite = addTestCase(suite)
     elif action == 6: #delete a test case
-        test_suite = removeTestCase(test_suite)
-    return test_suite
+        new_solution.test_suite = removeTestCase(suite)
+
+    return new_solution
 
 ###################################################################
 #Hill Climbing, using random ascent
@@ -146,7 +145,6 @@ maxActions = 20
 
 # Generate an initial solution.
 # This is a random test suite (1-20 tests), each with 1-20 actions
-
 solution_current = Solution()
 solution_current.test_suite = generateTestSuite(metadata,maxTestsCases, maxActions)
 calculateFitness(solution_current)
@@ -157,40 +155,37 @@ solution_soft = copy.deepcopy(solution_current)
 print('Initial fitness: ' + str(solution_current.fitness))
 
 gen = 1
-maxGen = 0
+maxGen = 2
 nSoftResets = 0
 
-while (gen < maxGen):
-    
-    fitness_new = fitness_current
+while (gen < maxGen): 
     tries = 30
     changed = False
     #SHOULD WE KEEP MUTATING THE MUTATED VERSION INSTEAD OF THE BEST? --------------------
     for i in range(tries):
-        action = random.randint(1,6)
-        solution_new = mutate(solution_current, action)
-        fitness_new = fitness(solution_new)
-        print(fitness_new)
-        solution_current = solution_new
+        solution_new = mutate(solution_current)
+        calculateFitness(solution_new)
+        print(solution_new.fitness)
+        solution_current = copy.deepcopy(solution_new)
         
-        if fitness_new > fitness_best:
+        if solution_new.fitness > solution_best.fitness:
             changed = True
-            solution_best = solution_current
-            fitness_best = fitness_new
+            solution_best = copy.deepcopy(solution_current)
+            fitness_best = solution_new.fitness
     
     #Because we keep mutating the mutated version, solution_current might get to an irreversible state. I thought of a way to make a "soft" and a "hard" reset. 
     if not changed:
         if nSoftResets < 10:
             #get solution_current to what it was before mutating
-            solution_current = solution_soft
+            solution_current = copy.deepcopy(solution_soft)
             nSoftResets = nSoftResets + 1
         else:
             #if 3 soft resets doesn't work, time to generate a completely new solution_current
             maxTestsCases = 20
             maxActions = 20
-            newTestSuite = generateTestSuite(metadata,maxTestsCases, maxActions)
-            solution_current = newTestSuite
-            solution_soft = solution_current
+            solution_current = Solution()
+            solution_current.test_suite = generateTestSuite(metadata, maxTestsCases, maxActions)
+            solution_soft = copy.deepcopy(solution_current)
             nSoftResets = 0
 
     # Increment generation
