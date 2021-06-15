@@ -1,4 +1,3 @@
-import simpleBMI
 import os
 from xml.dom import minidom
 import random
