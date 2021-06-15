@@ -1,30 +1,29 @@
 {
     "file": "simpleBMI",
     "class": "BMICalc",
-    "constructors": [
-        { 
-            "parameters": [
-                {
-                    "type": "integer",
-                    "min": 0
-                },
-                {
-                    "type": "integer",
-                    "min": 0
-                },
-                {
-                    "type": "integer",
-                    "min": 0,
-                    "max": 150
-                },
-                {
-                    "type": "integer",
-                    "min": 0,
-                    "max": 1
-                }
-            ]
-        }   
-    ],
+    "constructor": 
+     { 
+        "parameters": [
+            {
+                "type": "integer",
+                "min": 0
+            },
+            {
+                "type": "integer",
+                "min": 0
+            },
+            {
+                "type": "integer",
+                "min": 0,
+                "max": 150
+            },
+            {
+                "type": "integer",
+                "min": 0,
+                "max": 1
+            }
+        ]
+    },
     "actions": [
         { 
             "name": "gender",

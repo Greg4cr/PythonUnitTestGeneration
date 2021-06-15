@@ -28,20 +28,14 @@ def generateTestCase(metadata, maxActions):
 
     return test_case
 
-# Generates a constructor call
-# Picks a random constructor and generates random (integer) input for that constructor
+# Generates a constructor call with random (integer) input
 def generateConstructor(metadata):
 
     # If there are no constructors, or if it has no parameters, create an empty parameter list
-    if "constructors" not in metadata.keys() or len(metadata["constructors"]) == 0:
+    if "constructor" not in metadata.keys() or "parameters" not in metadata["constructor"].keys() or len(metadata["constructor"]["parameters"]) == 0:
         parameter_data = []
     else:
-        which_constructor = random.randint(0, len(metadata["constructors"]) - 1)
-    
-        if "parameters" in metadata["constructors"][which_constructor].keys():
-            parameter_data = metadata["constructors"][which_constructor]["parameters"]
-        else:
-            parameter_data= []
+        parameter_data = metadata["constructor"]["parameters"]
 
     parameters = []
 
