@@ -65,22 +65,42 @@ def addRandomAction(test_suite):
     test_suite[testSelected].append(generateAction(metadata))
     return test_suite
     
-def changeRandomParameter(test_suite, increment):
+def changeRandomParameter(test_suite):
     nTestCases = len(test_suite) - 1
     testCaseSelected = random.randint(0,nTestCases)
     nActions = len(test_suite[testCaseSelected]) - 1
     actionSelected = random.randint(0,(nActions))
+    # Increment or decrement by a random amount  
+    increment = random.randint(-10, 10)
 
     # Constructor
     if  test_suite[testCaseSelected][actionSelected][0] == -1:
         nParameters = len(test_suite[testCaseSelected][actionSelected][1]) - 1
-        parmeterSelected = random.randint(0,nParameters)
-        test_suite[testCaseSelected][actionSelected][1][parmeterSelected] = test_suite[testCaseSelected][actionSelected][1][parmeterSelected] + increment
+        parameterSelected = random.randint(0,nParameters)
+        value = test_suite[testCaseSelected][actionSelected][1][parameterSelected]
+        parameter_data = metadata["constructor"]["parameters"][parameterSelected]
+        if "min" in parameter_data.keys():
+            if value + increment < parameter_data["min"]:
+                increment = parameter_data["min"] - value 
+        if "max" in parameter_data.keys():
+            if value + increment > parameter_data["max"]:
+                increment = parameter_data["max"] - value 
+
+        test_suite[testCaseSelected][actionSelected][1][parameterSelected] += increment
     # Action
     elif "parameters" in metadata["actions"][test_suite[testCaseSelected][actionSelected][0]] and len(metadata["actions"][test_suite[testCaseSelected][actionSelected][0]]["parameters"]) > 0:
         nParameters = len(test_suite[testCaseSelected][actionSelected][1]) - 1
-        parmeterSelected = random.randint(0,nParameters)
-        test_suite[testCaseSelected][actionSelected][1][parmeterSelected] = test_suite[testCaseSelected][actionSelected][1][parmeterSelected] + increment
+        parameterSelected = random.randint(0,nParameters)
+        value = test_suite[testCaseSelected][actionSelected][1][parameterSelected]
+        parameter_data = metadata["actions"][test_suite[testCaseSelected][actionSelected][0]]["parameters"][parameterSelected]
+        if "min" in parameter_data.keys():
+            if value + increment < parameter_data["min"]:
+                increment = parameter_data["min"] - value 
+        if "max" in parameter_data.keys():
+            if value + increment > parameter_data["max"]:
+                increment = parameter_data["max"] - value 
+
+        test_suite[testCaseSelected][actionSelected][1][parameterSelected] += increment
     return test_suite
 
 def addTestCase(test_suite):
@@ -101,14 +121,14 @@ def mutate(solution):
     Mutation - constrain possible actions - Pick one test case, make one change to actions in that test case:
         — Add an action
         — Delete an action
-        — Change parameters of an action (limited range of values, increment or decrement integer a fixed amount)
+        — Change parameters of an action (limited range of values, increment or decrement integer by a random change from a Gaussian distribution)
         — Add a new test case with a constructor
         — Remove a test case
     '''
 
     new_solution = Solution()
     suite = copy.deepcopy(solution.test_suite)
-    action = random.randint(1,6)
+    action = random.randint(1,5)
         
     #SHOULD WE DELETE AND ADD TEST CASES INSTEAD OF ACTIONS? -------
     
@@ -116,13 +136,11 @@ def mutate(solution):
         new_solution.test_suite = deleteRandomAction(suite)
     elif action == 2: #add an action
         new_solution.test_suite = addRandomAction(suite)
-    elif action == 3: #change random parameter - increment by 1
-        new_solution.test_suite = changeRandomParameter(suite, 1)    
-    elif action == 4: #change random parameter - decrement by 1
-        new_solution.test_suite = changeRandomParameter(suite, -1)
-    elif action == 5: #add a test case
+    elif action == 3: #change random parameter by random amount
+        new_solution.test_suite = changeRandomParameter(suite)    
+    elif action == 4: #add a test case
         new_solution.test_suite = addTestCase(suite)
-    elif action == 6: #delete a test case
+    elif action == 5: #delete a test case
         new_solution.test_suite = removeTestCase(suite)
 
     return new_solution
@@ -150,7 +168,7 @@ print('Initial fitness: ' + str(solution_current.fitness))
 gen = 1
 maxGen = 50
 
-while (gen < maxGen): 
+while gen < maxGen: 
     tries = 50
     changed = False
 
