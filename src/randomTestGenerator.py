@@ -11,7 +11,6 @@ metadata = parseMetadata('BMICalc_metadata.json')
 
 # For each constructor, note number of parameters.
 # All parameters are assumed to be integers
-inits = [4]
 
 # Actions
 # Format is [name of action, type of action (assign, method), number of parameters
@@ -101,10 +100,10 @@ def writeToFile(test_suite):
 
         # Print each test step
 
-        for action in range(1, len(test_case)): 
-            name = actions[test_case[action][0]][0]
+        for action in range(1, len(test_case)):
+            name = metadata["actions"][test_case[action][0]]["name"] 
             parameters = test_case[action][1]
-            type = actions[test_case[action][0]][1]
+            type = metadata["actions"][test_case[action][0]]["type"]
 
             out_string = ''
 

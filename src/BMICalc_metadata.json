@@ -83,12 +83,12 @@
             ]
         },
         {
-            "name": "calculateBMI_teensAndChildren",
+            "name": "classifyBMI_teensAndChildren",
             "type": "method",
             "parameters": []
         },
         {
-            "name": "calculateBMI_adults",
+            "name": "classifyBMI_adults",
             "type": "method",
             "parameters": []
         }
