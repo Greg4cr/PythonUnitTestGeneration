@@ -4,6 +4,7 @@ from xml.dom import minidom
 import random
 import string
 from file_utilities import *
+from generation_utilities import *
 
 ###### Import metadata
 
@@ -27,55 +28,6 @@ actions = [['gender', 'assign', 1], ['height', 'assign', 1], ['weight', 'assign'
 Each step is [ index in action list , [ parameter values] ]
 '''
 
-#TODO: Get global variables in each function (so they could work from a helper file)
-
-# Generates a constructor call
-# Picks a random constructor and generates random (integer) input for that constructor
-def generateConstructor():
-    which_constructor = random.randint(0, len(metadata["constructors"]) - 1)
-    parameter_data = metadata["constructors"][which_constructor]["parameters"]
-
-    parameters = []
-
-    for parameter in range(len(parameter_data)):
-        if "min" in parameter_data[parameter]:
-            min = parameter_data[parameter]["min"]
-        else:
-            min = -999
-
-        if "max" in parameter_data[parameter]:
-            max = parameter_data[parameter]["max"]
-        else:
-            max = 999
-
-        parameters.append(random.randint(min, max))
-   
-    return [-1, parameters]
-   
-# Generate a random action on the CUT
-# Selects a random action, then generates random (integer) input for that action
-def generateAction():
-    which_action = random.randint(0, len(metadata["actions"]) - 1)
-    parameter_data = metadata["actions"][which_action]["parameters"]
-
-    parameters = []
-
-    for parameter in range(len(parameter_data)):
-        if "min" in parameter_data[parameter]:
-            min = parameter_data[parameter]["min"]
-        else:
-            min = -999
-
-        if "max" in parameter_data[parameter]:
-            max = parameter_data[parameter]["max"]
-        else:
-            max = 999
-
-        parameters.append(random.randint(min, max))
-   
-    action = [which_action, parameters]
-
-    return action
 
 ##### Prints genotype to a file (pytest code) and measures code coverage
 #TODO: GET COVERAGE VALUE FROM SCRIPT INSTEAD OF A XML FILE ---- Some times this process bugs when in a loop.
@@ -106,24 +58,6 @@ def fitness(test_suite):
     a =  float(getCoverage(test_suite))
     b = float(len(test_suite))/10
     return a*100 - b
-
-
-#SHOULD EVERY TASE CASE HAVE THE SAME AMMOUNT OF ACTIONS? --------------------
-def generateTestSuite(maxTestsCases, maxActions):
-    nTestsCases = random.randint(1,maxTestsCases)
-    test_suite = []
-    for i in range(nTestsCases):
-        test_case = []    
-        # Initialize the CUT
-        test_case.append(generateConstructor()) 
-        # Generate actions
-        nActions = random.randint(0,maxActions)
-        for j in range(nActions):
-            test_case.append(generateAction())
-        test_suite.append(test_case)    
-    return test_suite
-
-
 
 '''
 Action library:
@@ -184,7 +118,7 @@ def changeRandomParameter(test_suite, increment):
 
 def addTestCase(test_suite):
     nActions = random.randint(0, 20)
-    new_testCase = generateTestSuite(1,nActions)
+    new_testCase = generateTestSuite(metadata,1,nActions)
     test_suite.extend(new_testCase)
     return test_suite
 
@@ -235,7 +169,7 @@ maxActions = 20
 # Generate an initial solution.
 # This is a random test suite (1-20 tests), each with 1-20 actions
 
-solution_current = generateTestSuite(maxTestsCases, maxActions)
+solution_current = generateTestSuite(metadata,maxTestsCases, maxActions)
 fitness_current = fitness(solution_current)
 solution_best = solution_current
 fitness_best = fitness_current
@@ -275,7 +209,7 @@ while (gen < maxGen):
             #if 3 soft resets doesn't work, time to generate a completely new solution_current
             maxTestsCases = 20
             maxActions = 20
-            newTestSuite = generateTestSuite(maxTestsCases, maxActions)
+            newTestSuite = generateTestSuite(metadata,maxTestsCases, maxActions)
             solution_current = newTestSuite
             solution_soft = solution_current
             nSoftResets = 0
