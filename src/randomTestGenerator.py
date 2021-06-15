@@ -3,14 +3,16 @@ import os
 from xml.dom import minidom
 import random
 import string
+from utilities import *
 
-# TODO - split reusable methods into a helper functions file
+###### Import metadata
 
-# TODO - pass through command line
+metadata = parseMetadata('BMICalc_metadata.json')
+print(metadata)
+print(metadata["actions"][0])
+
 file = 'simpleBMI'
 cut = 'BMICalc'
-
-# TODO - either scrape actions from file or define and document a generic format and expect the user to define the list of actions
 
 # For each constructor, note number of parameters.
 # All parameters are assumed to be integers
@@ -139,7 +141,7 @@ def fitness(test_suite):
 
 
 #SHOULD EVERY TASE CASE HAVE THE SAME AMMOUNT OF ACTIONS? --------------------
-def randomTestSuite(maxTestsCases, maxActions):
+def generateTestSuite(maxTestsCases, maxActions):
     nTestsCases = random.randint(1,maxTestsCases)
     test_suite = []
     for i in range(nTestsCases):
@@ -214,7 +216,7 @@ def changeRandomParameter(test_suite, increment):
 
 def addTestCase(test_suite):
     nActions = random.randint(0, 20)
-    new_testCase = randomTestSuite(1,nActions)
+    new_testCase = generateTestSuite(1,nActions)
     test_suite.extend(new_testCase)
     return test_suite
 
@@ -257,26 +259,29 @@ def mutate(test_suite, action):
     return test_suite
 
 
-######### Generate a random test suite (1-20 tests), each with 1-20 actions
+#Hill Climbing, using random ascent
+
 maxTestsCases = 20
 maxActions = 20
-test_suite = randomTestSuite(maxTestsCases, maxActions)
-#print(fitness(test_suite))
 
-#Hill Climbing random ascent
-solution_current = test_suite
+# Generate an initial solution.
+# This is a random test suite (1-20 tests), each with 1-20 actions
+
+solution_current = generateTestSuite(maxTestsCases, maxActions)
+fitness_current = fitness(solution_current)
 solution_best = solution_current
+fitness_best = fitness_current
 solution_soft = solution_current
-fitness_best = fitness(test_suite)
+
+print('Initial fitness: ' + str(fitness_current))
 
 gen = 1
-maxGen = 500
+maxGen = 0
 nSoftResets = 0
-while (gen < maxGen or fitness_best > 90):
-    gen = gen + 1
-    fitness_current = fitness(solution_current)
-    fitness_new = fitness_current
+
+while (gen < maxGen):
     
+    fitness_new = fitness_current
     tries = 30
     changed = False
     #SHOULD WE KEEP MUTATING THE MUTATED VERSION INSTEAD OF THE BEST? --------------------
@@ -302,13 +307,14 @@ while (gen < maxGen or fitness_best > 90):
             #if 3 soft resets doesn't work, time to generate a completely new solution_current
             maxTestsCases = 20
             maxActions = 20
-            newTestSuite = randomTestSuite(maxTestsCases, maxActions)
+            newTestSuite = generateTestSuite(maxTestsCases, maxActions)
             solution_current = newTestSuite
             solution_soft = solution_current
             nSoftResets = 0
 
+    # Increment generation
+    gen += 1
+
 print("Best Test Suite: %d" %solution_best)
 print("Best Fitness: %d" %fitness_best)
-print("Number of generations used: %d" %gen)
-
-        
+print("Number of generations used: %d" %gen)        
