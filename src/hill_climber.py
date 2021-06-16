@@ -173,7 +173,7 @@ while gen < maxGen:
         solution_current = Solution()
         solution_current.test_suite = generateTestSuite(metadata, maxTestsCases, maxActions)
         calculateFitness(metadata, fitness_function, solution_current)
-        print("Gen: " + str(gen) + ", RESET, new fitness: " + str(solution_new.fitness))
+        print("Gen: " + str(gen) + ", RESET, new fitness: " + str(solution_current.fitness))
 
     # Increment generation
     gen += 1
