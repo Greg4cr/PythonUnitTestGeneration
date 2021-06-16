@@ -147,31 +147,33 @@ print('Initial fitness: ' + str(solution_current.fitness))
 
 gen = 1
 maxGen = 100
+maxTries = 200
 
 while gen < maxGen: 
-    tries = 200 
+    tries = 1
     changed = False
 
-    for i in range(tries):
+    while tries < maxTries and changed != True:
         solution_new = mutate(solution_current)
         calculateFitness(metadata, fitness_function, solution_new)
 
         if solution_new.fitness > solution_current.fitness:
             print("Gen: " + str(gen) + ", new fitness: " + str(solution_new.fitness))
-            print("Tries before finding new solution: " + str(i))
+            print("Tries before finding new solution: " + str(tries))
             solution_current = copy.deepcopy(solution_new)
             changed = True
        
             if solution_new.fitness > solution_best.fitness:
                 solution_best = copy.deepcopy(solution_current)
 
-    # Reset the search if no better mutant is found within 50 attempts.
+        tries += 1
+
+    # Reset the search if no better mutant is found within a set number of attempts.
     if changed == False:
         solution_current = Solution()
         solution_current.test_suite = generateTestSuite(metadata, maxTestsCases, maxActions)
         calculateFitness(metadata, fitness_function, solution_current)
         print("Gen: " + str(gen) + ", RESET, new fitness: " + str(solution_new.fitness))
-
 
     # Increment generation
     gen += 1
