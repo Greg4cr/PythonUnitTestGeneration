@@ -9,7 +9,7 @@ from file_utilities import *
 def statementFitness(metadata, solution):
     fitness = 0.0
     writeToFile(metadata, solution.test_suite)
-    process = subprocess.Popen(['pytest', '--cov=' + metadata["file"]], stdout=subprocess.PIPE)
+    process = subprocess.Popen(["pytest", "--cov=" + metadata["file"]], stdout=subprocess.PIPE)
     stdout = str(process.communicate()[0])
     lines = stdout.split("\\n")
     for line in lines:
@@ -26,6 +26,8 @@ def calculateFitness(metadata, fitness_function, solution):
 
     if fitness_function == "statement": 
         fitness += statementFitness(metadata, solution)
+    else:
+        raise Exception("Not a valid fitness function.")
 
     # Add a penalty to control test suite size
         fitness -= float(len(solution.test_suite)/10)

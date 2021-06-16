@@ -7,23 +7,23 @@ class Solution:
 
 # Generates a test suite, containing between 1 and "max" test cases
 # Each test case will contain 1 - "max" actions.
-def generateTestSuite(metadata, maxTestsCases, maxActions):
-    nTestsCases = random.randint(1,maxTestsCases)
+def generateTestSuite(metadata, max_test_cases, max_actions):
+    num_test_cases = random.randint(1, max_test_cases)
     test_suite = []
-    for i in range(nTestsCases):
-        test_suite.append(generateTestCase(metadata,maxActions))    
+    for i in range(num_test_cases):
+        test_suite.append(generateTestCase(metadata, max_actions))    
     return test_suite
 
 # Generate a test case of length 1 - max number of actions
 # A test case initializes the CUT, then performs actions on it
-def generateTestCase(metadata, maxActions):
+def generateTestCase(metadata, max_actions):
     test_case = []    
     # Initialize the CUT
     test_case.append(generateConstructor(metadata)) 
 
     # Generate actions
-    nActions = random.randint(0,maxActions)
-    for j in range(nActions):
+    num_actions = random.randint(0,max_actions)
+    for j in range(num_actions):
         test_case.append(generateAction(metadata))
 
     return test_case
