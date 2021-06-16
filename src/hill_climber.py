@@ -146,8 +146,8 @@ solution_best = copy.deepcopy(solution_current)
 print('Initial fitness: ' + str(solution_current.fitness))
 
 gen = 1
-maxGen = 100
-maxTries = 200
+maxGen = 500
+maxTries = 100
 
 while gen < maxGen: 
     tries = 1
@@ -178,7 +178,13 @@ while gen < maxGen:
     # Increment generation
     gen += 1
 
+# Stats on final test suite
+
 print("Best Test Suite:")
 print(solution_best.test_suite)
 print("Best Fitness: " + str(solution_best.fitness))
 print("Number of generations used: " + str(gen))
+
+# Print final test suite to file
+
+writeToFile(metadata, solution_best.test_suite)
