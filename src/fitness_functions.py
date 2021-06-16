@@ -6,7 +6,6 @@ from file_utilities import *
 # Measures statement coverage of a test suite.
 # Fitness is on scale 1-100. 
 # The goal is to maximize the fitness
-
 def statementFitness(metadata, solution):
     fitness = 0.0
     writeToFile(metadata, solution.test_suite)
@@ -28,7 +27,7 @@ def calculateFitness(metadata, fitness_function, solution):
     if fitness_function == "statement": 
         fitness += statementFitness(metadata, solution)
 
-    # Add a small penalty to control test suite size
-        fitness += float(len(solution.test_suite))/10
+    # Add a penalty to control test suite size
+        fitness -= float(len(solution.test_suite)/10)
 
     solution.fitness = fitness

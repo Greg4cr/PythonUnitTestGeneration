@@ -147,7 +147,7 @@ print('Initial fitness: ' + str(solution_current.fitness))
 
 gen = 1
 maxGen = 500
-maxTries = 100
+maxTries = 500
 
 while gen < maxGen: 
     tries = 1
