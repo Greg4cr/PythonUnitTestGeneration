@@ -1,34 +1,11 @@
-import subprocess
-from xml.dom import minidom
 import random
-import string
 import copy
-import time
 from file_utilities import *
 from generation_utilities import *
+from fitness_functions import *
 
-##### Measures statement coverage
-def getCoverage(solution):
-    fitness = 0.0
-    writeToFile(metadata, solution.test_suite)
-    process = subprocess.Popen(['pytest', '--cov=' + metadata["file"]], stdout=subprocess.PIPE)
-    stdout = str(process.communicate()[0])
-    lines = stdout.split("\\n")
-    for line in lines:
-        # Line we want starts with TOTAL
-        if "TOTAL" in line:
-            words = line.split(" ")
-            coverage = words[len(words)-1]
-            fitness = coverage[:len(coverage)-1]
-
-    return fitness
-
-#ADDED A SMALL PENALTY FOR NUMBER OF TEST CASES USED. 
-def calculateFitness(solution):
-    #fitness = coverage percentage - a small penalty for the number of tests
-    a = float(getCoverage(solution))
-    b = float(len(solution.test_suite))/10
-    solution.fitness = a - b
+# TODO: Pass in metadata file location, number of generations, number of tries before reset via command line
+# TODO: Polish code, add comments, make sure style consistent
 
 ###################################################################
 # Mutation functions, used in the hill climber to manipulate solutions
@@ -152,6 +129,9 @@ def mutate(solution):
 # Import metadata
 metadata = parseMetadata('example/BMICalc_metadata.json')
 
+# Set fitness function
+fitness_function = "statement"
+
 maxTestsCases = 20
 maxActions = 20
 
@@ -159,25 +139,26 @@ maxActions = 20
 # This is a random test suite (1-20 tests), each with 1-20 actions
 solution_current = Solution()
 solution_current.test_suite = generateTestSuite(metadata,maxTestsCases, maxActions)
-calculateFitness(solution_current)
+calculateFitness(metadata, fitness_function, solution_current)
 
 solution_best = copy.deepcopy(solution_current)
 
 print('Initial fitness: ' + str(solution_current.fitness))
 
 gen = 1
-maxGen = 50
+maxGen = 100
 
 while gen < maxGen: 
-    tries = 50
+    tries = 200 
     changed = False
 
     for i in range(tries):
         solution_new = mutate(solution_current)
-        calculateFitness(solution_new)
+        calculateFitness(metadata, fitness_function, solution_new)
 
         if solution_new.fitness > solution_current.fitness:
-            print("New fitness: " + str(solution_new.fitness))
+            print("Gen: " + str(gen) + ", new fitness: " + str(solution_new.fitness))
+            print("Tries before finding new solution: " + str(i))
             solution_current = copy.deepcopy(solution_new)
             changed = True
        
@@ -188,7 +169,9 @@ while gen < maxGen:
     if changed == False:
         solution_current = Solution()
         solution_current.test_suite = generateTestSuite(metadata, maxTestsCases, maxActions)
-        calculateFitness(solution_current)
+        calculateFitness(metadata, fitness_function, solution_current)
+        print("Gen: " + str(gen) + ", RESET, new fitness: " + str(solution_new.fitness))
+
 
     # Increment generation
     gen += 1

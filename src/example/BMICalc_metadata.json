@@ -2,93 +2,31 @@
     "file": "simpleBMI",
     "location": "example/",
     "class": "BMICalc",
-    "constructor": 
-     { 
+    "constructor": { 
         "parameters": [
-            {
-                "type": "integer",
-                "min": 0
-            },
-            {
-                "type": "integer",
-                "min": 0
-            },
-            {
-                "type": "integer",
-                "min": 0,
-                "max": 150
-            },
-            {
-                "type": "integer",
-                "min": 0,
-                "max": 1
-            }
-        ]
-    },
+            { "type": "integer", "min": 0 },
+            { "type": "integer", "min": 0 },
+            { "type": "integer", "min": 0, "max": 150 },
+            { "type": "integer", "min": 0, "max": 1 }
+        ] },
     "actions": [
-        { 
-            "name": "gender",
-            "type": "assign",
-            "parameters": [ 
-                {
-                    "type": "integer",
-                    "min": 0,
-                    "max": 1
-                }
-           ]
+        { "name": "gender", "type": "assign", "parameters": [ 
+            { "type": "integer", "min": 0, "max": 1 } 
+        ] },
+        { "name": "height", "type": "assign", "parameters": [ 
+            { "type": "integer", "min": 0 } ] 
         },
-        { 
-            "name": "height",
-            "type": "assign",
-            "parameters": [ 
-                {
-                    "type": "integer",
-                    "min": 0
-                }
-           ]
+        { "name": "weight", "type": "assign", "parameters": [ 
+            { "type": "integer", "min": 0 } ] 
         },
-        { 
-            "name": "weight",
-            "type": "assign",
-            "parameters": [ 
-                {
-                    "type": "integer",
-                    "min": 0
-                }
-           ]
+        { "name": "age", "type": "assign", "parameters": [ 
+            { "type": "integer", "min": 0, "max": 150 } ] 
         },
-        { 
-            "name": "age",
-            "type": "assign",
-            "parameters": [ 
-                {
-                    "type": "integer",
-                    "min": 0,
-                    "max": 150
-                }
-           ]
-        },
-        {
-            "name": "calculateBMI",
-            "type": "method",
-            "parameters": [
-                {
-                    "type": "integer",
-                    "min": 0
-                },
-                {
-                    "type": "integer",
-                    "min": 0
-                }
-            ]
-        },
-        {
-            "name": "classifyBMI_teensAndChildren",
-            "type": "method"
-        },
-        {
-            "name": "classifyBMI_adults",
-            "type": "method"
-        }
+        { "name": "calculateBMI", "type": "method", "parameters": [
+            { "type": "integer", "min": 0 },
+            { "type": "integer", "min": 0 } 
+        ] },
+        { "name": "classifyBMI_teensAndChildren", "type": "method" },
+        { "name": "classifyBMI_adults", "type": "method" }
     ]
 }
