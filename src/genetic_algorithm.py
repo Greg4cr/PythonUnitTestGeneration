@@ -222,7 +222,7 @@ population_size = 15
 
 # Get command-line arguments
 try:
-    opts, args = getopt.getopt(sys.argv[1:],"hm:f:c:a:g:t:")
+    opts, args = getopt.getopt(sys.argv[1:],"hm:f:c:a:g:t:p:")
 except getopt.GetoptError:
         print("hill_climber.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -t <maximum number of mutations before restarting> -p <population size>")
         sys.exit(2)
