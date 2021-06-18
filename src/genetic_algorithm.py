@@ -216,11 +216,11 @@ def uniform_crossover(parent1, parent2):
         else:
             offspring1.test_suite.append(parent2.test_suite[test])
             offspring2.test_suite.append(parent1.test_suite[test])
-    
+   
     # Divide leftover tests between children
     mid = int(len(leftovers)/2)
-    offspring1.test_suite = offspring1.test_suite + leftovers[:mid]
-    offspring2.test_suite = offspring2.test_suite + leftovers[mid:]
+#    offspring1.test_suite = offspring1.test_suite + leftovers[:mid]
+#    offspring2.test_suite = offspring2.test_suite + leftovers[mid:]
     calculateFitness(metadata, fitness_function, offspring1)
     calculateFitness(metadata, fitness_function, offspring2)
 
