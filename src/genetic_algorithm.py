@@ -227,14 +227,14 @@ exhaustion = 30
 
 # Get command-line arguments
 try:
-    opts, args = getopt.getopt(sys.argv[1:],"hm:f:c:a:g:t:p:x:s:")
+    opts, args = getopt.getopt(sys.argv[1:],"hm:f:c:a:g:t:p:x:s:e:")
 except getopt.GetoptError:
-        print("genetic_algorithm.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size>")
+        print("genetic_algorithm.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size> -e <max generations before exhaustion>")
         sys.exit(2)
 													  		
 for opt, arg in opts:
     if opt == "-h":
-        print("genetic_algorithm.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size>")
+        print("genetic_algorithm.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size> -e <max generations before exhaustion>")
         sys.exit()
     elif opt == "-m":
         metadata_location = arg
@@ -274,7 +274,12 @@ for opt, arg in opts:
         tournament_size = int(arg)
 
         if tournament_size < 3:
-            raise Exception("tournament_size cannot be < 3.")
+            raise exception("tournament_size cannot be < 3.")
+    elif opt == "-e":
+        exhaustion = int(arg)
+
+        if exhaustion < 1:
+            raise exception("exhaustion cannot be < 1.")
 
 
 # Import metadata
