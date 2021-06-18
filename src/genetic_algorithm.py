@@ -9,6 +9,7 @@
 # -s <tournament size, for selection>
 # -t <mutation probability>
 # -x <crossover probability>
+# -e <number of generations before search terminates due to lack of improvement>
 # -c <maximum number of test cases in a randomly-generated test suite>
 # -a <maxmium number of actions (variable assignments, method calls) in a randomly-generated test case>
 ###################################################################
@@ -221,6 +222,9 @@ crossover_probability = 0.7
 # Tournament size
 tournament_size = 6
 
+# Exhaustion (number of generations before GA terminates due to lack of improvement)
+exhaustion = 30
+
 # Get command-line arguments
 try:
     opts, args = getopt.getopt(sys.argv[1:],"hm:f:c:a:g:t:p:x:s:")
@@ -284,8 +288,9 @@ solution_best = copy.deepcopy(population[0])
 
 # Continue to evolve until the generation budget is exhausted.
 gen = 1
+stagnation = -1
 
-while gen <= max_gen:
+while gen <= max_gen and stagnation <= exhaustion:
     new_population = []
 
     while len(new_population) < len(population):
@@ -309,8 +314,10 @@ while gen <= max_gen:
         # Store best
         if offspring1.fitness > solution_best.fitness:
             solution_best = copy.deepcopy(offspring1)
+            stagnation = -1
         if offspring2.fitness > solution_best.fitness:
             solution_best = copy.deepcopy(offspring2)
+            stagnation = -1
 
     # Set the new population as the current population.
     population = new_population
@@ -319,6 +326,7 @@ while gen <= max_gen:
 
     # Increment Generation
     gen += 1
+    stagnation += 1
 
 # Print the best test suite to a file
 writeToFile(metadata, solution_best.test_suite)
