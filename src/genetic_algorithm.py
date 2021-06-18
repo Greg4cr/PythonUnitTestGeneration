@@ -170,6 +170,7 @@ def selection(population, tournament_size):
     return solution_best
 
 # Creates new "child" test suites by swapping test cases between the parents
+# TODO: This is a very simple single point crossover. An alternative would be to potentially swap at each test case. This could be better, so think about it.
 # TODO: We could also perform a more complex crossover where we swap actions as well. We should think about whether that makes sense. For now, I think what we have is OK.
 def crossover(parent1, parent2):
 
