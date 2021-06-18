@@ -88,6 +88,11 @@ def calculateFitness(metadata, fitness_function, solution):
         raise Exception("Not a valid fitness function.")
 
     # Add a penalty to control test suite size
-        fitness -= float(len(solution.test_suite)/10)
+    fitness -= float(len(solution.test_suite)/10)
+
+    # Add a penalty to control each test case size
+    for i in range(len(solution.test_suite)):
+        fitness -= float(len(solution.test_suite[i])/20)
+
 
     solution.fitness = fitness
