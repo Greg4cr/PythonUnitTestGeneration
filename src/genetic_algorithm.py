@@ -314,12 +314,12 @@ for opt, arg in opts:
         tournament_size = int(arg)
 
         if tournament_size < 3:
-            raise exception("tournament_size cannot be < 3.")
+            raise Exception("tournament_size cannot be < 3.")
     elif opt == "-e":
         exhaustion = int(arg)
 
         if exhaustion < 1:
-            raise exception("exhaustion cannot be < 1.")
+            raise Exception("exhaustion cannot be < 1.")
     elif opt == "-o":
         crossover_operator = arg
  
