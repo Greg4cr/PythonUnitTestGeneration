@@ -9,6 +9,7 @@
 # -s <tournament size, for selection>
 # -t <mutation probability>
 # -x <crossover probability>
+# -o <crossover operator (choices: single, uniform)>
 # -e <number of generations before search terminates due to lack of improvement>
 # -c <maximum number of test cases in a randomly-generated test suite>
 # -a <maxmium number of actions (variable assignments, method calls) in a randomly-generated test case>
@@ -171,8 +172,7 @@ def selection(population, tournament_size):
     return solution_best
 
 # Creates new "child" test suites by swapping test cases between the parents
-# TODO: This is a very simple single point crossover. An alternative would be to potentially swap at each test case. This could be better, so think about it.
-# TODO: We could also perform a more complex crossover where we swap actions as well. We should think about whether that makes sense. For now, I think what we have is OK.
+# Single-point crossover (pick an index and swap between parents at that index.
 def crossover(parent1, parent2):
 
     if len(parent1.test_suite) > len(parent2.test_suite):
@@ -184,6 +184,43 @@ def crossover(parent1, parent2):
     offspring2 = Solution()
     offspring1.test_suite = parent1.test_suite[:pos] + parent2.test_suite[pos:]
     offspring2.test_suite = parent2.test_suite[:pos] + parent1.test_suite[pos:]
+    calculateFitness(metadata, fitness_function, offspring1)
+    calculateFitness(metadata, fitness_function, offspring2)
+
+    return (offspring1, offspring2)
+
+# Creates new "child" test suites by swapping test cases between the parents
+# Uniform crossover (Choose a parent source at each test case)
+def uniform_crossover(parent1, parent2):
+
+    # Get maximum index where both have test cases
+    if len(parent1.test_suite) > len(parent2.test_suite):
+        stop = len(parent2.test_suite)
+        leftovers = parent1.test_suite[len(parent2.test_suite):]
+    else:
+        stop = len(parent1.test_suite)
+        leftovers = parent2.test_suite[len(parent1.test_suite):]
+
+    offspring1 = Solution()
+    offspring2 = Solution()
+
+    # For each test
+    for test in range(stop):
+        # Flip a coin
+        choice = random.randint(1, 2)
+        # Option 1: Offspring 1 gets test from Parent 1, Offspring 2 gets test from Parent 2
+        if choice == 1:
+            offspring1.test_suite.append(parent1.test_suite[test])
+            offspring2.test_suite.append(parent2.test_suite[test])
+        # Option 2: Offspring 1 gets test from Parent 2, Offspring 2 gets test from Parent 1
+        else:
+            offspring1.test_suite.append(parent2.test_suite[test])
+            offspring2.test_suite.append(parent1.test_suite[test])
+    
+    # Divide leftover tests between children
+    mid = int(len(leftovers)/2)
+    offspring1.test_suite = offspring1.test_suite + leftovers[:mid]
+    offspring2.test_suite = offspring2.test_suite + leftovers[mid:]
     calculateFitness(metadata, fitness_function, offspring1)
     calculateFitness(metadata, fitness_function, offspring2)
 
@@ -219,6 +256,9 @@ mutation_probability = 0.7
 # Crossover probability
 crossover_probability = 0.7
 
+# Crossover operator
+crossover_operator = "single"
+
 # Tournament size
 tournament_size = 6
 
@@ -227,14 +267,14 @@ exhaustion = 30
 
 # Get command-line arguments
 try:
-    opts, args = getopt.getopt(sys.argv[1:],"hm:f:c:a:g:t:p:x:s:e:")
+    opts, args = getopt.getopt(sys.argv[1:],"hm:f:c:a:g:t:p:x:s:e:o:")
 except getopt.GetoptError:
-        print("genetic_algorithm.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size> -e <max generations before exhaustion>")
+        print("genetic_algorithm.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size> -e <max generations before exhaustion> -o <crossover operator>")
         sys.exit(2)
 													  		
 for opt, arg in opts:
     if opt == "-h":
-        print("genetic_algorithm.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size> -e <max generations before exhaustion>")
+        print("genetic_algorithm.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size> -e <max generations before exhaustion> -o <crossover operator>")
         sys.exit()
     elif opt == "-m":
         metadata_location = arg
@@ -280,6 +320,11 @@ for opt, arg in opts:
 
         if exhaustion < 1:
             raise exception("exhaustion cannot be < 1.")
+    elif opt == "-o":
+        crossover_operator = arg
+ 
+        if crossover_operator != "single" and crossover_operator != "uniform":
+            raise Exception("Crossover operator should be either 'single' or 'uniform'")
 
 
 # Import metadata
@@ -305,7 +350,10 @@ while gen <= max_gen and stagnation <= exhaustion:
 
         # Crossover
         if random.random() < crossover_probability:
-            (offspring1, offspring2) = crossover(offspring1, offspring2)
+            if crossover_operator == "single":
+                (offspring1, offspring2) = crossover(offspring1, offspring2)
+            else:
+                (offspring1, offspring2) = uniform_crossover(offspring1, offspring2)
 
         # Mutation
         if random.random() < mutation_probability:
