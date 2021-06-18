@@ -1,12 +1,14 @@
 ###################################################################
-# Simple hill-climber for generating pytest-formatted Python unit tests
-# Based on the random ascent algorithm (with restarts)
+# Simple genetic algorithm for generating pytest-formatted Python unit tests
 #
 # Command-Line parameters:
 # -m <metadata file location>
-# -f <fitness function (choices: statement)>
+# -f <fitness function (choices: statement, output)>
 # -g <search budget, the maximum number of generations before printing the best solution found>
-# -t <maximum number of mutations tried before restarting the search>
+# -p <population size>
+# -s <tournament size, for selection>
+# -t <mutation probability>
+# -x <crossover probability>
 # -c <maximum number of test cases in a randomly-generated test suite>
 # -a <maxmium number of actions (variable assignments, method calls) in a randomly-generated test case>
 ###################################################################
@@ -20,22 +22,8 @@ from generation_utilities import *
 from fitness_functions import *
 
 ###################################################################
-# Mutation functions, used in the hill climber to manipulate solutions
+# Mutation an crossover functions, used in the genetic algorithm to manipulate solutions
 ###################################################################
-
-'''
-Example test case:
-[
-[0, [1]],
-[1, [5]],
-[4, [6,7]],
-[6, []]
-]
-Each step is [ index in action list , [ parameter values] ]
-Actions are stored in the metadata dictionary at metadata["actions"][index]. 
-Example test suite:
-[[[-1, [642, 626, 53, -38]], [1, [612]], [4, [958, 46]]], [[-1, [257, 679, 337, 821]], [1, [74]], [0, [24]]], [[-1, [161, 409, 468, 675]], [1, [173]], [3, [926]]], [[-1, [870, -82, 949, 676]], [6, []], [4, [632, -88]]], [[-1, [235, 392, 366, 929]], [6, []], [6, []]], [[-1, [809, 508, 353, 706]], [6, []], [2, [72]]], [[-1, [276, 328, 691, -63]], [1, [538]], [3, [625]]], [[-1, [654, 69, 549, -1]], [3, [40]], [3, [741]]], [[-1, [147, 678, 485, 535]], [3, [321]], [6, []]], [[-1, [325, 291, 940, 169]], [6, []], [3, [484]]], [[-1, [745, 278, 232, 909]], [5, []], [0, [403]]], [[-1, [162, 993, 315, 186]], [4, [26, 980]], [1, [498]]], [[-1, [-95, 493, 68, 655]], [4, [881, 146]], [1, [295]]]]
-'''
 
 # Delete a random action from an existing test
 def deleteRandomAction(test_suite):
@@ -149,36 +137,42 @@ def mutate(solution):
         new_solution.test_suite = addTestCase(suite)
     elif action == 5: # delete a test case
         new_solution.test_suite = removeTestCase(suite)
+
     calculateFitness(metadata, fitness_function, new_solution)
+
     return new_solution
 
-def create_population(size):
+# Creates an initial population of test suites.
+def createPopulation(size):
     population = []
-    print("Creating new population.")
+
     for i in range(size):
         new_solution = Solution()
         new_solution.test_suite = generateTestSuite(metadata, max_test_cases, max_actions)
         calculateFitness(metadata, fitness_function, new_solution)
         population.append(new_solution)
-        #print('Initial fitness: ' + str(solution_current.fitness))
-    print("Population created.")
+
     return population
 
+# Selects a random proportion of the population and identifies the best solution in that sample (selection)
 def selection(population, tournament_size):
-    try:
-        assert tournament_size > 1
-    except:
+    if not tournament_size > 1:
         raise Exception("Variable tournament_size must be greater than 1.")
 
     competition = random.sample(population, tournament_size)
     solution_best = copy.deepcopy(competition[0])
+
     for i in range(1, (tournament_size-1)):
         if competition[i].fitness > solution_best.fitness:
             solution_best = copy.deepcopy(competition[i])
+
     # Return a copy of the best solution
     return solution_best
 
+# Creates new "child" test suites by swapping test cases between the parents
+# TODO: We could also perform a more complex crossover where we swap actions as well. We should think about whether that makes sense. For now, I think what we have is OK.
 def crossover(parent1, parent2):
+
     if len(parent1.test_suite) > len(parent2.test_suite):
         pos = random.randint(1, len(parent2.test_suite))
     else:
@@ -214,22 +208,28 @@ max_actions = 20
 # Maximum number of generations
 max_gen = 200
 
-# Maximum number of mutations to try before restarting
-max_tries = 500
-
 # Population size
-population_size = 15
+population_size = 20
+
+# Mutation probability
+mutation_probability = 0.7
+
+# Crossover probability
+crossover_probability = 0.7
+
+# Tournament size
+tournament_size = 6
 
 # Get command-line arguments
 try:
-    opts, args = getopt.getopt(sys.argv[1:],"hm:f:c:a:g:t:p:")
+    opts, args = getopt.getopt(sys.argv[1:],"hm:f:c:a:g:t:p:x:s:")
 except getopt.GetoptError:
-        print("hill_climber.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -t <maximum number of mutations before restarting> -p <population size>")
+        print("genetic_algorithm.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size>")
         sys.exit(2)
 													  		
 for opt, arg in opts:
     if opt == "-h":
-        print("hill_climber.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -t <maximum number of mutations before restarting> -p <population size>")
+        print("genetic_algorithm.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size>")
         sys.exit()
     elif opt == "-m":
         metadata_location = arg
@@ -251,65 +251,70 @@ for opt, arg in opts:
         if max_gen < 1:
             raise Exception("max_gen cannot be < 1.")
     elif opt == "-t":
-        max_tries = int(arg)
+        mutation_probability = float(arg)
 
-        if max_tries < 1:
-            raise Exception("max_tries cannot be < 1.")
+        if mutation_probability < 0.0 or mutation_probability > 1.0:
+            raise Exception("mutation_probability must be between 0 and 1.")
+    elif opt == "-x":
+        crossover_probability = float(arg)
+
+        if crossover_probability < 0.0 or crossover_probability > 1.0:
+            raise Exception("crossover_probability must be between 0 and 1.")
     elif opt == "-p":
         population_size = int(arg)
 
-        if population_size < 0:
+        if population_size < 3:
             raise Exception("population_size cannot be < 3.")
+    elif opt == "-s":
+        tournament_size = int(arg)
+
+        if tournament_size < 3:
+            raise Exception("tournament_size cannot be < 3.")
+
+
 # Import metadata
 metadata = parseMetadata(metadata_location)
 
 #create initial population
-population = create_population(population_size)
-
-#The tournament_size parameter specifies how many randomly selected individuals out of the population participate in each "tournament".
-tournament_size = int(len(population)/3)
-if tournament_size < 3:
-    tournament_size = 3
+population = createPopulation(population_size)
 
 #Initialize best solution
-#best = copy.deepcopy(population[0])
+solution_best = copy.deepcopy(population[0])
 
 # Continue to evolve until the generation budget is exhausted.
 gen = 1
 
-#Initialize best
-best = copy.deepcopy(population[0])
-
 while gen <= max_gen:
     new_population = []
+
     while len(new_population) < len(population):
         # Selection
         offspring1 = selection(population, tournament_size)
         offspring2 = selection(population, tournament_size)
 
         # Crossover
-        if random.random() < 0.7:
+        if random.random() < crossover_probability:
             (offspring1, offspring2) = crossover(offspring1, offspring2)
 
         # Mutation
-        offspring1 = mutate(offspring1)
-        offspring2 = mutate(offspring2)
+        if random.random() < mutation_probability:
+            offspring1 = mutate(offspring1)
+        if random.random() < mutation_probability:
+            offspring2 = mutate(offspring2)
 
         new_population.append(offspring1)
         new_population.append(offspring2)
 
         # Store best
-        if offspring1.fitness > best.fitness:
-            best = copy.deepcopy(offspring1)
-        if offspring2.fitness > best.fitness:
-            best = copy.deepcopy(offspring2)
+        if offspring1.fitness > solution_best.fitness:
+            solution_best = copy.deepcopy(offspring1)
+        if offspring2.fitness > solution_best.fitness:
+            solution_best = copy.deepcopy(offspring2)
 
-    # Restart population
+    # Set the new population as the current population.
     population = new_population
 
-    print(
-            "Best fitness at generation %d: %.8f" %
-            (gen, best.fitness))
+    print("Best fitness at generation %d: %.8f" % (gen, solution_best.fitness))
 
     # Increment Generation
     gen += 1

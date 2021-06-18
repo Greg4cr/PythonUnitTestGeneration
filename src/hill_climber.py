@@ -4,7 +4,7 @@
 #
 # Command-Line parameters:
 # -m <metadata file location>
-# -f <fitness function (choices: statement)>
+# -f <fitness function (choices: statement, output)>
 # -g <search budget, the maximum number of generations before printing the best solution found>
 # -t <maximum number of mutations tried before restarting the search>
 # -r <maximum number of restarts>
