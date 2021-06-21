@@ -5,6 +5,10 @@ class Solution:
     test_suite = []
     fitness = -1
 
+    def __init__(self):
+       self.test_suite = []
+       self.fitness = -1
+
 # Generates a test suite, containing between 1 and "max" test cases
 # Each test case will contain 1 - "max" actions.
 def generateTestSuite(metadata, max_test_cases, max_actions):
