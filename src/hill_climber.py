@@ -250,14 +250,14 @@ while gen <= max_gen and restarts <= max_restarts:
 
         # If the solution is an improvement, make it the new solution.
         if solution_new.fitness > solution_current.fitness:
-            print("Gen: " + str(gen) + ", new fitness: " + str(solution_new.fitness))
-            print("Tries before finding new solution: " + str(tries))
             solution_current = copy.deepcopy(solution_new)
             changed = True
        
             # If it is the best solution seen so far, then store it.
             if solution_new.fitness > solution_best.fitness:
                 solution_best = copy.deepcopy(solution_current)
+
+            print("Best fitness at generation " + str(gen) + ": " + str(solution_best.fitness) + ", Number of Tests: " + str(len(solution_best.test_suite)) + ", Tries: " + str(tries))
 
         tries += 1
 

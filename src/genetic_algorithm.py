@@ -377,7 +377,7 @@ while gen <= max_gen and stagnation <= exhaustion:
     # Set the new population as the current population.
     population = new_population
 
-    print("Best fitness at generation %d: %.8f" % (gen, solution_best.fitness))
+    print("Best fitness at generation %d: %.8f, Number of Tests: %d" % (gen, solution_best.fitness, len(solution_best.test_suite)))
 
     # Increment Generation
     gen += 1
