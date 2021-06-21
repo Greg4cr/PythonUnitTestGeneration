@@ -259,7 +259,7 @@ mutation_probability = 0.7
 crossover_probability = 0.7
 
 # Crossover operator
-crossover_operator = "single"
+crossover_operator = "uniform"
 
 # Tournament size
 tournament_size = 6
@@ -382,6 +382,13 @@ while gen <= max_gen and stagnation <= exhaustion:
     # Increment Generation
     gen += 1
     stagnation += 1
+
+# Print information about the best test suite seen
+
+print("Best Test Suite:")
+print(solution_best.test_suite)
+print("Best Fitness: " + str(solution_best.fitness))
+print("Number of generations used: " + str(gen))
 
 # Print the best test suite to a file
 writeToFile(metadata, solution_best.test_suite)
