@@ -9,7 +9,7 @@ from file_utilities import *
 def statementFitness(metadata, solution):
     fitness = 0.0
     writeToFile(metadata, solution.test_suite)
-    process = subprocess.Popen(["pytest", "--cov=" + metadata["file"]], stdout=subprocess.PIPE)
+    process = subprocess.Popen(["pytest", "--cov=" + metadata["file"], metadata["location"] + "/test_" + metadata["file"] + ".py"], stdout=subprocess.PIPE)
     stdout = str(process.communicate()[0])
     lines = stdout.split("\\n")
     for line in lines:
@@ -32,7 +32,7 @@ def outputFitness(metadata, solution):
     str_output = []
     
     writeToFileLogging(metadata, solution.test_suite)
-    process = subprocess.Popen(["pytest", "-s", "-o", "log_cli=true", "-o", "log_cli_level=INFO"], stdout=subprocess.PIPE)
+    process = subprocess.Popen(["pytest", "-s", "-o", "log_cli=true", "-o", "log_cli_level=INFO", metadata["location"] + "/test_" + metadata["file"] + ".py"], stdout=subprocess.PIPE)
     stdout = str(process.communicate()[0])
     lines = stdout.split("\\n")
     for line in lines:
