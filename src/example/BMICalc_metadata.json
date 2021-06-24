@@ -4,24 +4,21 @@
     "class": "BMICalc",
     "constructor": { 
         "parameters": [
-            { "type": "integer", "min": 0 },
-            { "type": "integer", "min": 0 },
-            { "type": "integer", "min": 0, "max": 150 }
+            { "type": "integer", "min": -1 },
+            { "type": "integer", "min": -1 },
+            { "type": "integer", "min": -1, "max": 150 }
         ] },
     "actions": [
         { "name": "height", "type": "assign", "parameters": [ 
-            { "type": "integer", "min": 0 } ] 
+            { "type": "integer", "min": -1 } ] 
         },
         { "name": "weight", "type": "assign", "parameters": [ 
-            { "type": "integer", "min": 0 } ] 
+            { "type": "integer", "min": -1 } ] 
         },
         { "name": "age", "type": "assign", "parameters": [ 
-            { "type": "integer", "min": 0, "max": 150 } ] 
+            { "type": "integer", "min": -1, "max": 150 } ] 
         },
-        { "name": "bmi_value", "type": "method", "parameters": [
-            { "type": "integer", "min": 0 },
-            { "type": "integer", "min": 0 } 
-        ] },
+        { "name": "bmi_value", "type": "method" },
         { "name": "classifyBMI_teensAndChildren", "type": "method" },
         { "name": "classifyBMI_adults", "type": "method" }
     ]
