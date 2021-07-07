@@ -1,6 +1,12 @@
 import bmi_calculator
 import pytest
 
+def test_bmi_constructor():
+    bmi_calc = bmi_calculator.BMICalc(170, 65, 28)
+    assert bmi_calc.height == 170
+    assert bmi_calc.weight == 65
+    assert bmi_calc.age == 28
+
 def test_bmi_value_valid():
     bmi_calc = bmi_calculator.BMICalc(150, 41, 18)
     bmi_value = bmi_calc.bmi_value()
@@ -22,7 +28,7 @@ def test_bmi_value_valid():
     assert pytest.approx(bmi_value, abs=0.1) == 38.2
 
 # Cases expected to throw exception
-def test_bmi_value_invalid_height():
+def test_invalid_height():
     # Testing Constructors
     with pytest.raises(ValueError) as context:
         bmi_calc = bmi_calculator.BMICalc(-150, 41, 18)
@@ -39,7 +45,7 @@ def test_bmi_value_invalid_height():
         bmi_calc.height = 0
 
 
-def test_bmi_value_invalid_weight():
+def test_invalid_weight():
     # Testing Constructors
     with pytest.raises(ValueError) as context:
         bmi_calc = bmi_calculator.BMICalc(150, -41, 18)
@@ -56,7 +62,7 @@ def test_bmi_value_invalid_weight():
         bmi_calc.weight = -5
        
 
-def test_bmi_value_invalid_age():
+def test_invalid_age():
     # Testing Constructors
     with pytest.raises(ValueError) as context:
         bmi_calc = bmi_calculator.BMICalc(150, 41, 0)
@@ -198,3 +204,13 @@ def test_bmi_children_19y():
     bmi_calc.weight = 90
     bmi_class = bmi_calc.classifyBMI_teensAndChildren()
     assert bmi_class == "Obese"
+
+def test_bmi_children_invalid():
+    bmi_calc = bmi_calculator.BMICalc(163, 57, 25)
+    with pytest.raises(ValueError) as context:
+        bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    
+def test_bmi_adult_invalid():
+    bmi_calc = bmi_calculator.BMICalc(170, 65, 15)
+    with pytest.raises(ValueError) as context:
+        bmi_class = bmi_calc.classifyBMI_adults()
