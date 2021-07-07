@@ -329,44 +329,47 @@ for opt, arg in opts:
             raise Exception("Crossover operator should be either 'single' or 'uniform'")
 
 
-# Import metadata
+# Import metadata.
 metadata = parseMetadata(metadata_location)
 
-#create initial population
+# Create initial population.
 population = createPopulation(population_size)
 
-#Initialize best solution
+# Initialize best solution as the first member of that population.
 solution_best = copy.deepcopy(population[0])
 
 # Continue to evolve until the generation budget is exhausted.
+# Stop if no improvement has been seen in some time (stagnation).
 gen = 1
 stagnation = -1
 
 while gen <= max_gen and stagnation <= exhaustion:
+    # Form a new population.
     new_population = []
 
     while len(new_population) < len(population):
-        # Selection
+        # Choose a subset of the population and identify the best solution in that subset (selection).
         offspring1 = selection(population, tournament_size)
         offspring2 = selection(population, tournament_size)
 
-        # Crossover
+        # Create new children by breeding elements of the best solutions (crossover)
         if random.random() < crossover_probability:
             if crossover_operator == "single":
                 (offspring1, offspring2) = crossover(offspring1, offspring2)
             else:
                 (offspring1, offspring2) = uniform_crossover(offspring1, offspring2)
 
-        # Mutation
+        # Introduce a small, random change to the population (mutation).
         if random.random() < mutation_probability:
             offspring1 = mutate(offspring1)
         if random.random() < mutation_probability:
             offspring2 = mutate(offspring2)
 
+        # Add the new members to the population.
         new_population.append(offspring1)
         new_population.append(offspring2)
 
-        # Store best
+        # If either offspring is better than the best-seen solution, make it the new best.
         if offspring1.fitness > solution_best.fitness:
             solution_best = copy.deepcopy(offspring1)
             stagnation = -1
@@ -379,7 +382,7 @@ while gen <= max_gen and stagnation <= exhaustion:
 
     print("Best fitness at generation %d: %.8f, Number of Tests: %d" % (gen, solution_best.fitness, len(solution_best.test_suite)))
 
-    # Increment Generation
+    # Increment the generation.
     gen += 1
     stagnation += 1
 
