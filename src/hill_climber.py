@@ -224,18 +224,16 @@ for opt, arg in opts:
 # Import metadata
 metadata = parseMetadata(metadata_location)
 
-# Generate an initial solution.
+# Generate an initial random solution, and calculate its fitness
 solution_current = Solution()
 solution_current.test_suite = generateTestSuite(metadata, max_test_cases, max_actions)
 calculateFitness(metadata, fitness_function, solution_current)
 
+# The initial solution is the best we have seen to date
 solution_best = copy.deepcopy(solution_current)
-
 print('Initial fitness: ' + str(solution_current.fitness))
 
-
 # Continue to evolve until the generation budget is exhausted or the number of restarts is exhausted.
-
 gen = 1
 restarts = 0
 
@@ -273,12 +271,10 @@ while gen <= max_gen and restarts <= max_restarts:
     gen += 1
 
 # Print information about the best test suite seen
-
 print("Best Test Suite:")
 print(solution_best.test_suite)
 print("Best Fitness: " + str(solution_best.fitness))
 print("Number of generations used: " + str(gen))
 
 # Print the best test suite to a file
-
 writeToFile(metadata, solution_best.test_suite)
