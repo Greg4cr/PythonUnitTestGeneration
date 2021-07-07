@@ -46,7 +46,7 @@ class BMICalc:
         return bmi_value
 
     def classifyBMI_teensAndChildren(self):
-        if (self.age < 2 and self.age > 19):
+        if (self.age < 2 or self.age > 19):
             raise ValueError('Invalid age. The children and teen BMI classification only works for ages between 2 and 19.')
 
         bmi_value = self.bmi_value()
