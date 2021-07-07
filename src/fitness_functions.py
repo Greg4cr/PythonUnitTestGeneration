@@ -1,8 +1,6 @@
 import subprocess
 from file_utilities import *
 
-# TODO: Add branch coverage, output coverage
-
 # Measures statement coverage of a test suite.
 # Fitness is on scale 1-100. 
 # The goal is to maximize the fitness
@@ -91,12 +89,10 @@ def calculateFitness(metadata, fitness_function, solution):
     fitness -= float(len(solution.test_suite)/10)
 
     # Add a penalty to control the length of individual test cases
+    # Get the average test suite length)
     total_length = 0
     for i in range(len(solution.test_suite)):
         total_length += len(solution.test_suite[i]) 
-
- 
-    # Get the average test suite length)
     total_length /= len(solution.test_suite)
     fitness -= float(total_length/30)
 
