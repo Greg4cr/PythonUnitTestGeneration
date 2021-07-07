@@ -126,8 +126,4 @@ class BMICalc:
                 return ("Severely Obese")
 
         else:
-<<<<<<< HEAD
-            raise ValueError("Invalid age. The adult BMI classification requires an age greather than 19.")
-=======
             raise ValueError("Invalid age. The adult BMI classification requires an age older than 19.")
->>>>>>> defdc4fc5630c607e0ebf4fba09d920acb66f9cf
