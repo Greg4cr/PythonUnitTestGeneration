@@ -392,6 +392,7 @@ print("Best Test Suite:")
 print(solution_best.test_suite)
 print("Best Fitness: " + str(solution_best.fitness))
 print("Number of generations used: " + str(gen))
+print("Number of tests: " + str(len(solution_best.test_suite)))
 
 # Print the best test suite to a file
 writeToFile(metadata, solution_best.test_suite)
