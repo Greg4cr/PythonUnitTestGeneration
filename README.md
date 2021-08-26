@@ -20,7 +20,7 @@ To execute test generation, choose your desired generation algorithm and set you
 
 The parameters that can be set for the genetic algorithm include:
 
-- -m <metadata file location> 
+- -m <metadata file location (default points to BMI example)> 
 - -f <fitness function (choices: statement (default), output)>
 - -g <search budget, the maximum number of generations before printing the best solution found (default: 200)>
 - -p <population size (default: 20)>
@@ -36,7 +36,7 @@ The parameters that can be set for the genetic algorithm include:
 
 The parameters that can be set for the hill climber include:
 
-- -m <metadata file location> 
+- -m <metadata file location (default points to BMI example)> 
 - -f <fitness function (choices: statement (default), output)>
 - -g <search budget, the maximum number of generations before printing the best solution found (default: 200)>
 - -t <maximum number of mutations tried before restarting the search (default: 500)>
