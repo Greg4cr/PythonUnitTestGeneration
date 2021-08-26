@@ -255,7 +255,7 @@ while gen <= max_gen and restarts <= max_restarts:
             if solution_new.fitness > solution_best.fitness:
                 solution_best = copy.deepcopy(solution_current)
 
-            print("Best fitness at generation " + str(gen) + ": " + str(solution_best.fitness) + ", Number of Tests: " + str(len(solution_best.test_suite)) + ", Tries: " + str(tries))
+            print("Best fitness at generation %d: %.8f, number of tests: %d, average test length: %d, mutation attempts: %d" % (gen, solution_best.fitness, len(solution_best.test_suite), solution_best.averageLength(), tries))
 
         tries += 1
 
@@ -276,6 +276,7 @@ print(solution_best.test_suite)
 print("Best Fitness: " + str(solution_best.fitness))
 print("Number of generations used: " + str(gen))
 print("Number of tests: " + str(len(solution_best.test_suite)))
+print("Average test length: " + str(solution_best.averageLength()))
 
 # Print the best test suite to a file
 writeToFile(metadata, solution_best.test_suite)

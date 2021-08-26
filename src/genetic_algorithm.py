@@ -380,7 +380,7 @@ while gen <= max_gen and stagnation <= exhaustion:
     # Set the new population as the current population.
     population = new_population
 
-    print("Best fitness at generation %d: %.8f, Number of Tests: %d" % (gen, solution_best.fitness, len(solution_best.test_suite)))
+    print("Best fitness at generation %d: %.8f, number of tests: %d, average test length: %d" % (gen, solution_best.fitness, len(solution_best.test_suite), solution_best.averageLength()))
 
     # Increment the generation.
     gen += 1
@@ -393,6 +393,7 @@ print(solution_best.test_suite)
 print("Best Fitness: " + str(solution_best.fitness))
 print("Number of generations used: " + str(gen))
 print("Number of tests: " + str(len(solution_best.test_suite)))
+print("Average test length:" + str(solution_best.averaageLength()))
 
 # Print the best test suite to a file
 writeToFile(metadata, solution_best.test_suite)

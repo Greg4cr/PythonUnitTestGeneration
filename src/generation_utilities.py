@@ -9,6 +9,15 @@ class Solution:
        self.test_suite = []
        self.fitness = -1
 
+    # Gets the average length of a test case
+    def averageLength(self):
+        actions=0.0;
+
+        for test in self.test_suite:
+            actions += len(test)
+
+        return actions / len(self.test_suite)
+
 # Generates a test suite, containing between 1 and "max" test cases
 # Each test case will contain 1 - "max" actions.
 def generateTestSuite(metadata, max_test_cases, max_actions):
