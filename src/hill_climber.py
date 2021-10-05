@@ -9,6 +9,8 @@
 # -r <maximum number of restarts>
 # -c <maximum number of test cases in a randomly-generated test suite>
 # -a <maxmium number of actions (variable assignments, method calls) in a randomly-generated test case>
+# -z <test suite size penalty>
+# -l <test length penalty>
 ###################################################################
 
 import copy
@@ -179,16 +181,22 @@ max_restarts = 5
 # Maximum number of mutations to try before restarting
 max_tries = 500
 
+# Test suite size penalty
+num_tests_penalty = 10
+
+# Test length penalty
+length_test_penalty = 30
+
 # Get command-line arguments
 try:
-    opts, args = getopt.getopt(sys.argv[1:],"hm:c:a:g:r:t:")
+    opts, args = getopt.getopt(sys.argv[1:],"hm:c:a:g:r:t:z:l:")
 except getopt.GetoptError:
-        print("hill_climber.py -m <metadata file location> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -r <maximum number of restarts> -t <maximum number of mutations before restarting>")
+        print("hill_climber.py -m <metadata file location> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -r <maximum number of restarts> -t <maximum number of mutations before restarting> -z <test suite size penalty> -l <test length penalty>")
         sys.exit(2)
 													  		
 for opt, arg in opts:
     if opt == "-h":
-        print("hill_climber.py -m <metadata file location> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -r <maximum number of restarts> -t <maximum number of mutations before restarting>")
+        print("hill_climber.py -m <metadata file location> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -r <maximum number of restarts> -t <maximum number of mutations before restarting> -z <test suite size penalty> -l <test length penalty>")
         sys.exit()
     elif opt == "-m":
         metadata_location = arg
@@ -217,6 +225,16 @@ for opt, arg in opts:
 
         if max_tries < 1:
             raise Exception("max_tries cannot be < 1.")
+    elif opt == "-z":
+        num_tests_penalty = int(arg)
+
+        if num_tests_penalty < 1:
+            raise Exception("num_tests_penalty cannot be < 1.")
+    elif opt == "-l":
+        length_test_penalty = int(arg)
+
+        if length_test_penalty < 1:
+            raise Exception("length_test_penalty cannot be < 1.")
 
 # Import metadata
 metadata = parse_metadata(metadata_location)
@@ -224,7 +242,7 @@ metadata = parse_metadata(metadata_location)
 # Generate an initial random solution, and calculate its fitness
 solution_current = Solution()
 solution_current.test_suite = generate_test_suite(metadata, max_test_cases, max_actions)
-calculate_fitness(metadata, fitness_function, solution_current)
+calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, solution_current)
 
 # The initial solution is the best we have seen to date
 solution_best = copy.deepcopy(solution_current)
@@ -241,7 +259,7 @@ while gen <= max_gen and restarts <= max_restarts:
     # Try random mutations until we see a better solutions, or until we exhaust the number of tries.
     while tries < max_tries and changed != True:
         solution_new = mutate(solution_current)
-        calculate_fitness(metadata, fitness_function, solution_new)
+        calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, solution_new)
 
         # If the solution is an improvement, make it the new solution.
         if solution_new.fitness > solution_current.fitness:
@@ -261,7 +279,7 @@ while gen <= max_gen and restarts <= max_restarts:
         restarts += 1
         solution_current = Solution()
         solution_current.test_suite = generate_test_suite(metadata, max_test_cases, max_actions)
-        calculate_fitness(metadata, fitness_function, solution_current)
+        calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, solution_current)
         print("Gen: " + str(gen) + ", RESET, new fitness: " + str(solution_current.fitness))
 
     # Increment generation

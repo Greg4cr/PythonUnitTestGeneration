@@ -19,7 +19,7 @@ def statement_fitness(metadata, solution):
 
     return float(fitness)
 
-def calculate_fitness(metadata, fitness_function, solution):
+def calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, solution):
     fitness = 0.0
 
     if fitness_function == "statement": 
@@ -28,12 +28,12 @@ def calculate_fitness(metadata, fitness_function, solution):
         raise Exception("Not a valid fitness function.")
 
     # Add a penalty to control test suite size
-    fitness -= float(len(solution.test_suite)/10)
+    fitness -= float(len(solution.test_suite) / num_tests_penalty)
 
     # Add a penalty to control the length of individual test cases
     # Get the average test suite length)
     total_length = 0
     total_length = sum([len(test) for test in solution.test_suite]) / len(solution.test_suite) 
-    fitness -= float(total_length/30)
+    fitness -= float(total_length / length_test_penalty)
 
     solution.fitness = fitness

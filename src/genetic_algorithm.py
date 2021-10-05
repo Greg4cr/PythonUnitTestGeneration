@@ -12,6 +12,8 @@
 # -e <number of generations before search terminates due to lack of improvement>
 # -c <maximum number of test cases in a randomly-generated test suite>
 # -a <maxmium number of actions (variable assignments, method calls) in a randomly-generated test case>
+# -z <test suite size penalty>
+# -l <test length penalty>
 ###################################################################
 
 import copy
@@ -139,7 +141,7 @@ def mutate(solution):
     elif action == 5: # delete a test case
         new_solution.test_suite = remove_test_case(suite)
 
-    calculate_fitness(metadata, fitness_function, new_solution)
+    calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, new_solution)
 
     return new_solution
 
@@ -150,7 +152,7 @@ def create_population(size):
     for i in range(size):
         new_solution = Solution()
         new_solution.test_suite = generate_test_suite(metadata, max_test_cases, max_actions)
-        calculate_fitness(metadata, fitness_function, new_solution)
+        calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, new_solution)
         population.append(new_solution)
 
     return population
@@ -183,8 +185,8 @@ def crossover(parent1, parent2):
     offspring2 = Solution()
     offspring1.test_suite = parent1.test_suite[:pos] + parent2.test_suite[pos:]
     offspring2.test_suite = parent2.test_suite[:pos] + parent1.test_suite[pos:]
-    calculate_fitness(metadata, fitness_function, offspring1)
-    calculate_fitness(metadata, fitness_function, offspring2)
+    calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, offspring1)
+    calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, offspring2)
 
     return (offspring1, offspring2)
 
@@ -222,8 +224,8 @@ def uniform_crossover(parent1, parent2):
     offspring1.test_suite = offspring1.test_suite + leftovers[:mid]
     offspring2.test_suite = offspring2.test_suite + leftovers[mid:]
 
-    calculate_fitness(metadata, fitness_function, offspring1)
-    calculate_fitness(metadata, fitness_function, offspring2)
+    calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, offspring1)
+    calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, offspring2)
 
     return (offspring1, offspring2)
 
@@ -266,16 +268,22 @@ tournament_size = 6
 # Exhaustion (number of generations before GA terminates due to lack of improvement)
 exhaustion = 30
 
+# Test suite size penalty
+num_tests_penalty = 10
+
+# Test length penalty
+length_test_penalty = 30
+
 # Get command-line arguments
 try:
-    opts, args = getopt.getopt(sys.argv[1:],"hm:c:a:g:t:p:x:s:e:o:")
+    opts, args = getopt.getopt(sys.argv[1:],"hm:c:a:g:t:p:x:s:e:o:z:l:")
 except getopt.GetoptError:
-        print("genetic_algorithm.py -m <metadata file location> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size> -e <max generations before exhaustion> -o <crossover operator>")
+        print("genetic_algorithm.py -m <metadata file location> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size> -e <max generations before exhaustion> -o <crossover operator> -z <test suite size penalty> -l <test length penalty>")
         sys.exit(2)
 													  		
 for opt, arg in opts:
     if opt == "-h":
-        print("genetic_algorithm.py -m <metadata file location> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size> -e <max generations before exhaustion> -o <crossover operator>")
+        print("genetic_algorithm.py -m <metadata file location> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size> -e <max generations before exhaustion> -o <crossover operator> -z <test suite size penalty> -l <test length penalty>")
         sys.exit()
     elif opt == "-m":
         metadata_location = arg
@@ -324,6 +332,16 @@ for opt, arg in opts:
  
         if crossover_operator != "single" and crossover_operator != "uniform":
             raise Exception("Crossover operator should be either 'single' or 'uniform'")
+    elif opt == "-z":
+        num_tests_penalty = int(arg)
+
+        if num_tests_penalty < 1:
+            raise Exception("num_tests_penalty cannot be < 1.")
+    elif opt == "-l":
+        length_test_penalty = int(arg)
+
+        if length_test_penalty < 1:
+            raise Exception("length_test_penalty cannot be < 1.")
 
 
 # Import metadata.
