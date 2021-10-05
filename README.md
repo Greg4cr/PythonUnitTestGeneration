@@ -15,6 +15,7 @@ In the `src/` folder, run `pip3 install -r requirements.txt` to install all depe
 Note that in Debian-based Linux distributions, such as Ubuntu, you may need to separately install the `python-pytest` and `python-pytest-cov` packages. You may do so by running the following commands:
 
 `sudo apt install python-pytest`
+
 `sudo apt install python-pytest-cov`
 
 # Execution
