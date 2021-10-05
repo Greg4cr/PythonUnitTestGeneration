@@ -84,133 +84,133 @@ def test_invalid_age():
 def test_bmi_adult():
     adult_age = 21
     bmi_calc = bmi_calculator.BMICalc(160, 65, 21)
-    bmi_class = bmi_calc.classifyBMI_adults()
+    bmi_class = bmi_calc.classify_bmi_adults()
     assert bmi_class == "Overweight"
 
     bmi_calc.height = 170
     bmi_calc.weight = 99
-    bmi_class = bmi_calc.classifyBMI_adults()
+    bmi_class = bmi_calc.classify_bmi_adults()
     assert bmi_class == "Obese"
 
     bmi_calc.height = 182
     bmi_calc.weight = 60
-    bmi_class = bmi_calc.classifyBMI_adults()
+    bmi_class = bmi_calc.classify_bmi_adults()
     assert bmi_class == "Underweight"
 
     bmi_calc.height = 190
     bmi_calc.weight = 70
-    bmi_class = bmi_calc.classifyBMI_adults()
+    bmi_class = bmi_calc.classify_bmi_adults()
     assert bmi_class == "Normal weight"
 
 
 def test_bmi_children_7y():
     bmi_calc = bmi_calculator.BMICalc(115, 19, 6)
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Overweight"
 
     bmi_calc.weight = 28
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Obese"
 
     bmi_calc.weight = 17
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Underweight"
 
     bmi_calc.weight = 18
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Normal weight"
 
 def test_bmi_children_4y():
     bmi_calc = bmi_calculator.BMICalc(100, 15, 4)
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Normal weight"
 
     bmi_calc.weight = 13
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Underweight"
 
     bmi_calc.weight = 18
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Overweight"
 
     bmi_calc.weight = 22
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Obese"
 
 def test_bmi_children_10y():
     bmi_calc = bmi_calculator.BMICalc(140, 31, 10)
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Normal weight"
 
     bmi_calc.weight = 26
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Underweight"
 
     bmi_calc.weight = 42
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Overweight"
 
     bmi_calc.weight = 50
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Obese"
 
 def test_bmi_children_13y():
     bmi_calc = bmi_calculator.BMICalc(155, 46, 13)
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Normal weight"
 
     bmi_calc.weight = 35
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Underweight"
 
     bmi_calc.weight = 58
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Overweight"
 
     bmi_calc.weight = 65
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Obese"
 
 def test_bmi_children_16y():
     bmi_calc = bmi_calculator.BMICalc(162, 63, 16)
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Normal weight"
 
     bmi_calc.weight = 42
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Underweight"
 
     bmi_calc.weight = 73
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Overweight"
 
     bmi_calc.weight = 80
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Obese"
 
 def test_bmi_children_19y():
     bmi_calc = bmi_calculator.BMICalc(163, 57, 19)
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Normal weight"
 
     bmi_calc.weight = 45
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Underweight"
 
     bmi_calc.weight = 75
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Overweight"
 
     bmi_calc.weight = 90
-    bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+    bmi_class = bmi_calc.classify_bmi_teens_and_children()
     assert bmi_class == "Obese"
 
 def test_bmi_children_invalid():
     bmi_calc = bmi_calculator.BMICalc(163, 57, 25)
     with pytest.raises(ValueError) as context:
-        bmi_class = bmi_calc.classifyBMI_teensAndChildren()
+        bmi_class = bmi_calc.classify_bmi_teens_and_children()
     
 def test_bmi_adult_invalid():
     bmi_calc = bmi_calculator.BMICalc(170, 65, 15)
     with pytest.raises(ValueError) as context:
-        bmi_class = bmi_calc.classifyBMI_adults()
+        bmi_class = bmi_calc.classify_bmi_adults()

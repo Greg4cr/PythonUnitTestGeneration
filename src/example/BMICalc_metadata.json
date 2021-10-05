@@ -19,7 +19,7 @@
             { "type": "integer", "min": -1, "max": 150 } ] 
         },
         { "name": "bmi_value", "type": "method" },
-        { "name": "classifyBMI_teensAndChildren", "type": "method" },
-        { "name": "classifyBMI_adults", "type": "method" }
+        { "name": "classify_bmi_teens_and_children", "type": "method" },
+        { "name": "classify_bmi_adults", "type": "method" }
     ]
 }

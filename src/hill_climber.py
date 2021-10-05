@@ -257,7 +257,7 @@ while gen <= max_gen and restarts <= max_restarts:
     changed = False
 
     # Try random mutations until we see a better solutions, or until we exhaust the number of tries.
-    while tries < max_tries and changed != True:
+    while tries < max_tries and not changed:
         solution_new = mutate(solution_current)
         calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, solution_new)
 
