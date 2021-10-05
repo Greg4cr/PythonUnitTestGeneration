@@ -30,6 +30,8 @@ The parameters that can be set for the genetic algorithm include:
 - -e <number of generations before search terminates due to lack of improvement (default: 30)>
 - -c <maximum number of test cases in a randomly-generated test suite (default: 20)>
 - -a <maxmium number of actions (variable assignments, method calls) in a randomly-generated test case (default: 20)>
+- -z <test suite size penalty (default: 10)>
+- -l <test case length penalty (default: 30)>
 
 `python3 hill_climber.py [parameters]`
 
@@ -41,5 +43,7 @@ The parameters that can be set for the hill climber include:
 - -r <maximum number of restarts (default: 5)>
 - -c <maximum number of test cases in a randomly-generated test suite (default: 20)>
 - -a <maxmium number of actions (variable assignments, method calls) in a randomly-generated test case (default: 20)>
+- -z <test suite size penalty (default: 10)>
+- -l <test case length penalty (default: 30)>
 
 Explanation of the two techniques and the parameters can be found in the book chapter.
