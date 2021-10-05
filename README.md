@@ -8,7 +8,14 @@ This tool is written targeting Python 3.6, and will not function properly under 
 
 # Installation 
 
+This tool requires the `pytest` and `pytest-cov` packages.
+
 In the `src/` folder, run `pip3 install -r requirements.txt` to install all dependencies.
+
+Note that in Debian-based Linux distributions, such as Ubuntu, you may need to separately install the `python-pytest` and `python-pytest-cov` packages. You may do so by running the following commands:
+
+`sudo apt install python-pytest`
+`sudo apt install python-pytest-cov`
 
 # Execution
 
