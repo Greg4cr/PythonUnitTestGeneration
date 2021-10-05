@@ -3,7 +3,6 @@
 #
 # Command-Line parameters:
 # -m <metadata file location>
-# -f <fitness function (choices: statement, output)>
 # -g <search budget, the maximum number of generations before printing the best solution found>
 # -p <population size>
 # -s <tournament size, for selection>
@@ -24,11 +23,11 @@ from generation_utilities import *
 from fitness_functions import *
 
 ###################################################################
-# Mutation an crossover functions, used in the genetic algorithm to manipulate solutions
+# Mutation and crossover functions, used in the genetic algorithm to manipulate solutions
 ###################################################################
 
 # Delete a random action from an existing test
-def deleteRandomAction(test_suite):
+def delete_random_action(test_suite):
     suite_size = len(test_suite) - 1
     test_case_selected = random.randint(0, suite_size)
 
@@ -40,14 +39,14 @@ def deleteRandomAction(test_suite):
     return test_suite
 
 # Add a random action to an existing test
-def addRandomAction(test_suite):
+def add_random_action(test_suite):
     suite_size = len(test_suite) - 1
     test_selected = random.randint(0, suite_size)
-    test_suite[test_selected].append(generateAction(metadata))
+    test_suite[test_selected].append(generate_action(metadata))
     return test_suite
 
 # Change a parameter of an existing action
-def changeRandomParameter(test_suite):
+def change_random_parameter(test_suite):
 
     # Select a test, action, and parameter
     suite_size = len(test_suite) - 1
@@ -99,14 +98,14 @@ def changeRandomParameter(test_suite):
     return test_suite
 
 # Add a test case to a suite
-def addTestCase(test_suite):
+def add_test_case(test_suite):
     num_actions = random.randint(0, max_actions)
-    new_test = generateTestSuite(metadata, 1, num_actions)
+    new_test = generate_test_suite(metadata, 1, num_actions)
     test_suite.extend(new_test)
     return test_suite
 
 # Delete a random test case from a suite
-def removeTestCase(test_suite):
+def remove_test_case(test_suite):
     suite_size = len(test_suite) - 1
 
     if suite_size > 1:
@@ -130,28 +129,28 @@ def mutate(solution):
     action = random.randint(1,5)
     
     if action == 1: # delete an action
-        new_solution.test_suite = deleteRandomAction(suite)
+        new_solution.test_suite = delete_random_action(suite)
     elif action == 2: # add an action
-        new_solution.test_suite = addRandomAction(suite)
+        new_solution.test_suite = add_random_action(suite)
     elif action == 3: # change random parameter 
-        new_solution.test_suite = changeRandomParameter(suite)    
+        new_solution.test_suite = change_random_parameter(suite)    
     elif action == 4: # add a test case
-        new_solution.test_suite = addTestCase(suite)
+        new_solution.test_suite = add_test_case(suite)
     elif action == 5: # delete a test case
-        new_solution.test_suite = removeTestCase(suite)
+        new_solution.test_suite = remove_test_case(suite)
 
-    calculateFitness(metadata, fitness_function, new_solution)
+    calculate_fitness(metadata, fitness_function, new_solution)
 
     return new_solution
 
 # Creates an initial population of test suites.
-def createPopulation(size):
+def create_population(size):
     population = []
 
     for i in range(size):
         new_solution = Solution()
-        new_solution.test_suite = generateTestSuite(metadata, max_test_cases, max_actions)
-        calculateFitness(metadata, fitness_function, new_solution)
+        new_solution.test_suite = generate_test_suite(metadata, max_test_cases, max_actions)
+        calculate_fitness(metadata, fitness_function, new_solution)
         population.append(new_solution)
 
     return population
@@ -184,8 +183,8 @@ def crossover(parent1, parent2):
     offspring2 = Solution()
     offspring1.test_suite = parent1.test_suite[:pos] + parent2.test_suite[pos:]
     offspring2.test_suite = parent2.test_suite[:pos] + parent1.test_suite[pos:]
-    calculateFitness(metadata, fitness_function, offspring1)
-    calculateFitness(metadata, fitness_function, offspring2)
+    calculate_fitness(metadata, fitness_function, offspring1)
+    calculate_fitness(metadata, fitness_function, offspring2)
 
     return (offspring1, offspring2)
 
@@ -223,8 +222,8 @@ def uniform_crossover(parent1, parent2):
     offspring1.test_suite = offspring1.test_suite + leftovers[:mid]
     offspring2.test_suite = offspring2.test_suite + leftovers[mid:]
 
-    calculateFitness(metadata, fitness_function, offspring1)
-    calculateFitness(metadata, fitness_function, offspring2)
+    calculate_fitness(metadata, fitness_function, offspring1)
+    calculate_fitness(metadata, fitness_function, offspring2)
 
     return (offspring1, offspring2)
 
@@ -269,19 +268,17 @@ exhaustion = 30
 
 # Get command-line arguments
 try:
-    opts, args = getopt.getopt(sys.argv[1:],"hm:f:c:a:g:t:p:x:s:e:o:")
+    opts, args = getopt.getopt(sys.argv[1:],"hm:c:a:g:t:p:x:s:e:o:")
 except getopt.GetoptError:
-        print("genetic_algorithm.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size> -e <max generations before exhaustion> -o <crossover operator>")
+        print("genetic_algorithm.py -m <metadata file location> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size> -e <max generations before exhaustion> -o <crossover operator>")
         sys.exit(2)
 													  		
 for opt, arg in opts:
     if opt == "-h":
-        print("genetic_algorithm.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size> -e <max generations before exhaustion> -o <crossover operator>")
+        print("genetic_algorithm.py -m <metadata file location> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size> -e <max generations before exhaustion> -o <crossover operator>")
         sys.exit()
     elif opt == "-m":
         metadata_location = arg
-    elif opt == "-f":
-        fitness_function = arg
     elif opt == "-c":
         max_test_cases = int(arg)
 
@@ -330,10 +327,10 @@ for opt, arg in opts:
 
 
 # Import metadata.
-metadata = parseMetadata(metadata_location)
+metadata = parse_metadata(metadata_location)
 
 # Create initial population.
-population = createPopulation(population_size)
+population = create_population(population_size)
 
 # Initialize best solution as the first member of that population.
 solution_best = copy.deepcopy(population[0])
@@ -380,7 +377,7 @@ while gen <= max_gen and stagnation <= exhaustion:
     # Set the new population as the current population.
     population = new_population
 
-    print("Best fitness at generation %d: %.8f, number of tests: %d, average test length: %d" % (gen, solution_best.fitness, len(solution_best.test_suite), solution_best.averageLength()))
+    print("Best fitness at generation %d: %.8f, number of tests: %d, average test length: %d" % (gen, solution_best.fitness, len(solution_best.test_suite), solution_best.average_length()))
 
     # Increment the generation.
     gen += 1
@@ -393,7 +390,7 @@ print(solution_best.test_suite)
 print("Best Fitness: " + str(solution_best.fitness))
 print("Number of generations used: " + str(gen))
 print("Number of tests: " + str(len(solution_best.test_suite)))
-print("Average test length:" + str(solution_best.averageLength()))
+print("Average test length:" + str(solution_best.average_length()))
 
 # Print the best test suite to a file
-writeToFile(metadata, solution_best.test_suite)
+write_to_file(metadata, solution_best.test_suite)

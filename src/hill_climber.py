@@ -4,7 +4,6 @@
 #
 # Command-Line parameters:
 # -m <metadata file location>
-# -f <fitness function (choices: statement, output)>
 # -g <search budget, the maximum number of generations before printing the best solution found>
 # -t <maximum number of mutations tried before restarting the search>
 # -r <maximum number of restarts>
@@ -39,7 +38,7 @@ Example test suite:
 '''
 
 # Delete a random action from an existing test
-def deleteRandomAction(test_suite):
+def delete_random_action(test_suite):
     suite_size = len(test_suite) - 1
     test_case_selected = random.randint(0, suite_size)
 
@@ -51,14 +50,14 @@ def deleteRandomAction(test_suite):
     return test_suite
 
 # Add a random action to an existing test
-def addRandomAction(test_suite):
+def add_random_action(test_suite):
     suite_size = len(test_suite) - 1
     test_selected = random.randint(0, suite_size)
-    test_suite[test_selected].append(generateAction(metadata))
+    test_suite[test_selected].append(generate_action(metadata))
     return test_suite
 
 # Change a parameter of an existing action
-def changeRandomParameter(test_suite):
+def change_random_parameter(test_suite):
 
     # Select a test, action, and parameter
     suite_size = len(test_suite) - 1
@@ -110,14 +109,14 @@ def changeRandomParameter(test_suite):
     return test_suite
 
 # Add a test case to a suite
-def addTestCase(test_suite):
+def add_test_case(test_suite):
     num_actions = random.randint(0, max_actions)
-    new_test = generateTestSuite(metadata, 1, num_actions)
+    new_test = generate_test_suite(metadata, 1, num_actions)
     test_suite.extend(new_test)
     return test_suite
 
 # Delete a random test case from a suite
-def removeTestCase(test_suite):
+def remove_test_case(test_suite):
     suite_size = len(test_suite) - 1
 
     if suite_size > 1:
@@ -141,15 +140,15 @@ def mutate(solution):
     action = random.randint(1,5)
     
     if action == 1: # delete an action
-        new_solution.test_suite = deleteRandomAction(suite)
+        new_solution.test_suite = delete_random_action(suite)
     elif action == 2: # add an action
-        new_solution.test_suite = addRandomAction(suite)
+        new_solution.test_suite = add_random_action(suite)
     elif action == 3: # change random parameter 
-        new_solution.test_suite = changeRandomParameter(suite)    
+        new_solution.test_suite = change_random_parameter(suite)    
     elif action == 4: # add a test case
-        new_solution.test_suite = addTestCase(suite)
+        new_solution.test_suite = add_test_case(suite)
     elif action == 5: # delete a test case
-        new_solution.test_suite = removeTestCase(suite)
+        new_solution.test_suite = remove_test_case(suite)
 
     return new_solution
 
@@ -182,19 +181,17 @@ max_tries = 500
 
 # Get command-line arguments
 try:
-    opts, args = getopt.getopt(sys.argv[1:],"hm:f:c:a:g:r:t:")
+    opts, args = getopt.getopt(sys.argv[1:],"hm:c:a:g:r:t:")
 except getopt.GetoptError:
-        print("hill_climber.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -r <maximum number of restarts> -t <maximum number of mutations before restarting>")
+        print("hill_climber.py -m <metadata file location> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -r <maximum number of restarts> -t <maximum number of mutations before restarting>")
         sys.exit(2)
 													  		
 for opt, arg in opts:
     if opt == "-h":
-        print("hill_climber.py -m <metadata file location> -f <fitness function> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -r <maximum number of restarts> -t <maximum number of mutations before restarting>")
+        print("hill_climber.py -m <metadata file location> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -r <maximum number of restarts> -t <maximum number of mutations before restarting>")
         sys.exit()
     elif opt == "-m":
         metadata_location = arg
-    elif opt == "-f":
-        fitness_function = arg
     elif opt == "-c":
         max_test_cases = int(arg)
 
@@ -222,12 +219,12 @@ for opt, arg in opts:
             raise Exception("max_tries cannot be < 1.")
 
 # Import metadata
-metadata = parseMetadata(metadata_location)
+metadata = parse_metadata(metadata_location)
 
 # Generate an initial random solution, and calculate its fitness
 solution_current = Solution()
-solution_current.test_suite = generateTestSuite(metadata, max_test_cases, max_actions)
-calculateFitness(metadata, fitness_function, solution_current)
+solution_current.test_suite = generate_test_suite(metadata, max_test_cases, max_actions)
+calculate_fitness(metadata, fitness_function, solution_current)
 
 # The initial solution is the best we have seen to date
 solution_best = copy.deepcopy(solution_current)
@@ -244,7 +241,7 @@ while gen <= max_gen and restarts <= max_restarts:
     # Try random mutations until we see a better solutions, or until we exhaust the number of tries.
     while tries < max_tries and changed != True:
         solution_new = mutate(solution_current)
-        calculateFitness(metadata, fitness_function, solution_new)
+        calculate_fitness(metadata, fitness_function, solution_new)
 
         # If the solution is an improvement, make it the new solution.
         if solution_new.fitness > solution_current.fitness:
@@ -255,7 +252,7 @@ while gen <= max_gen and restarts <= max_restarts:
             if solution_new.fitness > solution_best.fitness:
                 solution_best = copy.deepcopy(solution_current)
 
-            print("Best fitness at generation %d: %.8f, number of tests: %d, average test length: %d, mutation attempts: %d" % (gen, solution_best.fitness, len(solution_best.test_suite), solution_best.averageLength(), tries))
+            print("Best fitness at generation %d: %.8f, number of tests: %d, average test length: %d, mutation attempts: %d" % (gen, solution_best.fitness, len(solution_best.test_suite), solution_best.average_length(), tries))
 
         tries += 1
 
@@ -263,8 +260,8 @@ while gen <= max_gen and restarts <= max_restarts:
     if changed == False:
         restarts += 1
         solution_current = Solution()
-        solution_current.test_suite = generateTestSuite(metadata, max_test_cases, max_actions)
-        calculateFitness(metadata, fitness_function, solution_current)
+        solution_current.test_suite = generate_test_suite(metadata, max_test_cases, max_actions)
+        calculate_fitness(metadata, fitness_function, solution_current)
         print("Gen: " + str(gen) + ", RESET, new fitness: " + str(solution_current.fitness))
 
     # Increment generation
@@ -276,7 +273,7 @@ print(solution_best.test_suite)
 print("Best Fitness: " + str(solution_best.fitness))
 print("Number of generations used: " + str(gen))
 print("Number of tests: " + str(len(solution_best.test_suite)))
-print("Average test length: " + str(solution_best.averageLength()))
+print("Average test length: " + str(solution_best.average_length()))
 
 # Print the best test suite to a file
-writeToFile(metadata, solution_best.test_suite)
+write_to_file(metadata, solution_best.test_suite)
