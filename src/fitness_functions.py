@@ -33,9 +33,7 @@ def calculate_fitness(metadata, fitness_function, solution):
     # Add a penalty to control the length of individual test cases
     # Get the average test suite length)
     total_length = 0
-    for i in range(len(solution.test_suite)):
-        total_length += len(solution.test_suite[i]) 
-    total_length /= len(solution.test_suite)
+    total_length = sum([len(test) for test in solution.test_suite]) / len(solution.test_suite) 
     fitness -= float(total_length/30)
 
     solution.fitness = fitness
