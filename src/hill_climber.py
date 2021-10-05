@@ -275,7 +275,7 @@ while gen <= max_gen and restarts <= max_restarts:
         tries += 1
 
     # Reset the search if no better mutant is found within a set number of attempts.
-    if changed == False:
+    if not changed:
         restarts += 1
         solution_current = Solution()
         solution_current.test_suite = generate_test_suite(metadata, max_test_cases, max_actions)
