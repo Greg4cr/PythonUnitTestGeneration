@@ -2,7 +2,7 @@
 
 A simple unit test input generator for Python. This code corresponds to the chapter on unit testing in the upcoming book "Optimising the Software Development Process with Artificial Intelligence".
 
-A pre-print of this chapter is available from (TODO: add URL).
+A pre-print of this chapter is available in the file `chapter.pdf`.
 
 This tool is written targeting Python 3.6, and will not function properly under Python 2. 
 
