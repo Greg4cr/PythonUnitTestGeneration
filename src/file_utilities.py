@@ -1,6 +1,7 @@
 import os
 import json
 
+
 # Parses metadata from a file and returns it in a dictionary
 def parse_metadata(filename):
     # Does the file exist?
@@ -16,19 +17,21 @@ def parse_metadata(filename):
 
     return metadata
 
+
 # Prints genotype representation to a file (pytest code)
 def write_to_file(metadata, test_suite):
     outfile = metadata["location"] + "test_" + metadata["file"] + ".py"
-    f= open(outfile,"w+") # Overwrites the old file with this name
+    f = open(outfile, "w+")  # Overwrites the old file with this name
     f.write("import " + metadata["file"] + "\nimport pytest\n")
 
     for test in range(len(test_suite)):
         test_case = test_suite[test]
-        f.write("\ndef test_%d():\n" % test)
+        f.write("\n\ndef test_%d():\n" % test)
 
         # Initialize the constructor
         parameters = test_case[0][1]
-        init_string = "\tcut = " + metadata["file"] + "." + metadata["class"] + "(" + str(parameters[0])
+        init_string = "\tcut = " + metadata["file"] + "." + metadata[
+            "class"] + "(" + str(parameters[0])
         for parameter in range(1, len(parameters)):
             init_string = init_string + "," + str(parameters[parameter])
 
@@ -39,23 +42,23 @@ def write_to_file(metadata, test_suite):
         # Print each test step
 
         for action in range(1, len(test_case)):
-            name = metadata["actions"][test_case[action][0]]["name"] 
+            name = metadata["actions"][test_case[action][0]]["name"]
             parameters = test_case[action][1]
-            type = metadata["actions"][test_case[action][0]]["type"]
+            action_type = metadata["actions"][test_case[action][0]]["type"]
 
             out_string = ""
 
-            if type == "assign":
+            if action_type == "assign":
                 out_string = "\tcut." + name + " = " + str(parameters[0]) + "\n"
-            elif type == "method":
-                if parameters != []: 
-                    out_string = "\tcut." + name + "(" + str(parameters[0]) 
+            elif action_type == "method":
+                if parameters:
+                    out_string = "\tcut." + name + "(" + str(parameters[0])
                     for parameter in range(1, len(parameters)):
                         out_string = out_string + "," + str(parameters[parameter])
                     out_string += ")\n"
                 else:
-                    out_string = "\tcut." + name + "()\n" 
+                    out_string = "\tcut." + name + "()\n"
 
             f.write(out_string)
-   
-    f.close() 
+
+    f.close()

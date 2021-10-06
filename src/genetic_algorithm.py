@@ -3,7 +3,8 @@
 #
 # Command-Line parameters:
 # -m <metadata file location>
-# -g <search budget, the maximum number of generations before printing the best solution found>
+# -g <search budget, the maximum number of generations before printing the best
+#     solution found>
 # -p <population size>
 # -s <tournament size, for selection>
 # -t <mutation probability>
@@ -11,22 +12,23 @@
 # -o <crossover operator (choices: single, uniform)>
 # -e <number of generations before search terminates due to lack of improvement>
 # -c <maximum number of test cases in a randomly-generated test suite>
-# -a <maxmium number of actions (variable assignments, method calls) in a randomly-generated test case>
+# -a <maximum number of actions (variable assignments, method calls) in a
+#     randomly-generated test case>
 # -z <test suite size penalty>
 # -l <test length penalty>
 ###################################################################
 
 import copy
 import getopt
-import random
 import sys
-from file_utilities import *
 from generation_utilities import *
 from fitness_functions import *
 
-###################################################################
-# Mutation and crossover functions, used in the genetic algorithm to manipulate solutions
-###################################################################
+
+# ##################################################################
+# Mutation and crossover functions, used in the genetic algorithm to
+# manipulate solutions
+# ##################################################################
 
 # Delete a random action from an existing test
 def delete_random_action(test_suite):
@@ -36,9 +38,11 @@ def delete_random_action(test_suite):
     if len(test_suite[test_case_selected]) > 1:
         num_actions = len(test_suite[test_case_selected]) - 1
         action_selected = random.randint(1, num_actions)
-        test_suite[test_case_selected].remove(test_suite[test_case_selected][action_selected])
+        test_suite[test_case_selected].remove(
+            test_suite[test_case_selected][action_selected])
 
     return test_suite
+
 
 # Add a random action to an existing test
 def add_random_action(test_suite):
@@ -47,14 +51,14 @@ def add_random_action(test_suite):
     test_suite[test_selected].append(generate_action(metadata))
     return test_suite
 
+
 # Change a parameter of an existing action
 def change_random_parameter(test_suite):
-
     # Select a test, action, and parameter
     suite_size = len(test_suite) - 1
     test_case_selected = random.randint(0, suite_size)
     num_actions = len(test_suite[test_case_selected]) - 1
-    action_selected = random.randint(0,(num_actions))
+    action_selected = random.randint(0, num_actions)
 
     # Increment or decrement by a random amount  
     increment = random.randint(-10, 10)
@@ -62,42 +66,56 @@ def change_random_parameter(test_suite):
     # If the action is a constructor call
     if test_suite[test_case_selected][action_selected][0] == -1:
         # Select the parameter to modify
-        num_parameters = len(test_suite[test_case_selected][action_selected][1]) - 1
+        num_parameters = len(
+            test_suite[test_case_selected][action_selected][1]) - 1
         parameter_selected = random.randint(0, num_parameters)
         parameter_data = metadata["constructor"]["parameters"][parameter_selected]
 
         # Get the current value of that parameter
-        value = test_suite[test_case_selected][action_selected][1][parameter_selected]
+        value = test_suite[test_case_selected][action_selected][1][
+            parameter_selected]
 
         if "min" in parameter_data.keys():
             if value + increment < parameter_data["min"]:
-                increment = parameter_data["min"] - value 
+                increment = parameter_data["min"] - value
         if "max" in parameter_data.keys():
             if value + increment > parameter_data["max"]:
-                increment = parameter_data["max"] - value 
+                increment = parameter_data["max"] - value
 
-        test_suite[test_case_selected][action_selected][1][parameter_selected] += increment
+        test_suite[test_case_selected][action_selected][1][
+            parameter_selected] += increment
 
     # If the parameter is an action (assignment or method call)
-    elif "parameters" in metadata["actions"][test_suite[test_case_selected][action_selected][0]] and len(metadata["actions"][test_suite[test_case_selected][action_selected][0]]["parameters"]) > 0:
+    elif "parameters" in metadata["actions"][
+        test_suite[test_case_selected][action_selected][0]] and len(
+        metadata["actions"][
+            test_suite[test_case_selected][action_selected][0]][
+            "parameters"]) > 0:
         # Select the parameter to modify
-        num_parameters = len(test_suite[test_case_selected][action_selected][1]) - 1
+        num_parameters = len(
+            test_suite[test_case_selected][action_selected][1]) - 1
         parameter_selected = random.randint(0, num_parameters)
-        parameter_data = metadata["actions"][test_suite[test_case_selected][action_selected][0]]["parameters"][parameter_selected]
+        parameter_data = \
+            metadata["actions"][
+                test_suite[test_case_selected][action_selected][0]][
+                "parameters"][parameter_selected]
 
         # Get the current value of that parameter
-        value = test_suite[test_case_selected][action_selected][1][parameter_selected]
+        value = test_suite[test_case_selected][action_selected][1][
+            parameter_selected]
 
         if "min" in parameter_data.keys():
             if value + increment < parameter_data["min"]:
-                increment = parameter_data["min"] - value 
+                increment = parameter_data["min"] - value
         if "max" in parameter_data.keys():
             if value + increment > parameter_data["max"]:
-                increment = parameter_data["max"] - value 
+                increment = parameter_data["max"] - value
 
-        test_suite[test_case_selected][action_selected][1][parameter_selected] += increment
+        test_suite[test_case_selected][action_selected][1][
+            parameter_selected] += increment
 
     return test_suite
+
 
 # Add a test case to a suite
 def add_test_case(test_suite):
@@ -105,6 +123,7 @@ def add_test_case(test_suite):
     new_test = generate_test_suite(metadata, 1, num_actions)
     test_suite.extend(new_test)
     return test_suite
+
 
 # Delete a random test case from a suite
 def remove_test_case(test_suite):
@@ -116,84 +135,95 @@ def remove_test_case(test_suite):
 
     return test_suite
 
+
 def mutate(solution):
-    '''
-    When we mutate a solution, we make one small change to it. That change can include:
+    """
+    When we mutate a solution, we make one small change to it. That change can
+    include:
         — Add an action to a test case
         — Delete an action from a test case
-        — Change parameters of an action (limited range of values, increment value by [-10, +10])
+        — Change parameters of an action (limited range of values, increment
+          value by [-10, +10])
         — Add a new test case to the suite
         — Remove a test case from the suite
-    '''
+    """
 
     new_solution = Solution()
     suite = copy.deepcopy(solution.test_suite)
-    action = random.randint(1,5)
-    
-    if action == 1: # delete an action
+    action = random.randint(1, 5)
+
+    if action == 1:  # delete an action
         new_solution.test_suite = delete_random_action(suite)
-    elif action == 2: # add an action
+    elif action == 2:  # add an action
         new_solution.test_suite = add_random_action(suite)
-    elif action == 3: # change random parameter 
-        new_solution.test_suite = change_random_parameter(suite)    
-    elif action == 4: # add a test case
+    elif action == 3:  # change random parameter
+        new_solution.test_suite = change_random_parameter(suite)
+    elif action == 4:  # add a test case
         new_solution.test_suite = add_test_case(suite)
-    elif action == 5: # delete a test case
+    elif action == 5:  # delete a test case
         new_solution.test_suite = remove_test_case(suite)
 
-    calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, new_solution)
+    calculate_fitness(metadata, fitness_function, num_tests_penalty,
+                      length_test_penalty, new_solution)
 
     return new_solution
 
+
 # Creates an initial population of test suites.
 def create_population(size):
-    population = []
+    pop = []
 
     for i in range(size):
         new_solution = Solution()
-        new_solution.test_suite = generate_test_suite(metadata, max_test_cases, max_actions)
-        calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, new_solution)
-        population.append(new_solution)
+        new_solution.test_suite = generate_test_suite(metadata, max_test_cases,
+                                                      max_actions)
+        calculate_fitness(metadata, fitness_function, num_tests_penalty,
+                          length_test_penalty, new_solution)
+        pop.append(new_solution)
 
-    return population
+    return pop
 
-# Selects a random proportion of the population and identifies the best solution in that sample (selection)
-def selection(population, tournament_size):
-    if not tournament_size > 1:
+
+# Selects a random proportion of the population and identifies the best
+# solution in that sample (selection)
+def selection(pop, size):
+    if not size > 1:
         raise Exception("Variable tournament_size must be greater than 1.")
 
-    competition = random.sample(population, tournament_size)
-    solution_best = copy.deepcopy(competition[0])
+    competition = random.sample(pop, size)
+    best = copy.deepcopy(competition[0])
 
-    for i in range(1, (tournament_size-1)):
-        if competition[i].fitness > solution_best.fitness:
-            solution_best = copy.deepcopy(competition[i])
+    for i in range(1, (size - 1)):
+        if competition[i].fitness > best.fitness:
+            best = copy.deepcopy(competition[i])
 
     # Return a copy of the best solution
-    return solution_best
+    return best
+
 
 # Creates new "child" test suites by swapping test cases between the parents
 # Single-point crossover (pick an index and swap between parents at that index.
 def crossover(parent1, parent2):
-
     if len(parent1.test_suite) > len(parent2.test_suite):
         pos = random.randint(1, len(parent2.test_suite))
     else:
         pos = random.randint(1, len(parent1.test_suite))
 
-    offspring1 = Solution()
-    offspring2 = Solution()
-    offspring1.test_suite = parent1.test_suite[:pos] + parent2.test_suite[pos:]
-    offspring2.test_suite = parent2.test_suite[:pos] + parent1.test_suite[pos:]
-    calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, offspring1)
-    calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, offspring2)
+    child1 = Solution()
+    child2 = Solution()
+    child1.test_suite = parent1.test_suite[:pos] + parent2.test_suite[pos:]
+    child2.test_suite = parent2.test_suite[:pos] + parent1.test_suite[pos:]
+    calculate_fitness(metadata, fitness_function, num_tests_penalty,
+                      length_test_penalty, child1)
+    calculate_fitness(metadata, fitness_function, num_tests_penalty,
+                      length_test_penalty, child2)
 
-    return (offspring1, offspring2)
+    return child1, child2
+
 
 # Creates new "child" test suites by swapping test cases between the parents
 # Uniform crossover (Choose a parent source at each test case)
 def uniform_crossover(parent1, parent2):
-
     # Get maximum index where both have test cases
     if len(parent1.test_suite) > len(parent2.test_suite):
         stop = len(parent2.test_suite)
@@ -202,47 +232,52 @@ def uniform_crossover(parent1, parent2):
         stop = len(parent1.test_suite)
         leftovers = parent2.test_suite[len(parent1.test_suite):]
 
-    offspring1 = Solution()
-    offspring2 = Solution()
+    child1 = Solution()
+    child2 = Solution()
 
     # For each test
     for test in range(stop):
         # Flip a coin
         choice = random.randint(1, 2)
-        # Option 1: Offspring 1 gets test from Parent 1, Offspring 2 gets test from Parent 2
+        # Option 1: Offspring 1 gets test from Parent 1, Offspring 2 gets test
+        # from Parent 2
         if choice == 1:
-            offspring1.test_suite.append(parent1.test_suite[test])
-            offspring2.test_suite.append(parent2.test_suite[test])
-        # Option 2: Offspring 1 gets test from Parent 2, Offspring 2 gets test from Parent 1
+            child1.test_suite.append(parent1.test_suite[test])
+            child2.test_suite.append(parent2.test_suite[test])
+        # Option 2: Offspring 1 gets test from Parent 2, Offspring 2 gets test
+        # from Parent 1
         else:
-            offspring1.test_suite.append(parent2.test_suite[test])
-            offspring2.test_suite.append(parent1.test_suite[test])
-   
+            child1.test_suite.append(parent2.test_suite[test])
+            child2.test_suite.append(parent1.test_suite[test])
+
     # Divide leftover tests between children
-    mid = int(len(leftovers)/2)
+    mid = int(len(leftovers) / 2)
 
-    offspring1.test_suite = offspring1.test_suite + leftovers[:mid]
-    offspring2.test_suite = offspring2.test_suite + leftovers[mid:]
+    child1.test_suite = child1.test_suite + leftovers[:mid]
+    child2.test_suite = child2.test_suite + leftovers[mid:]
 
-    calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, offspring1)
-    calculate_fitness(metadata, fitness_function, num_tests_penalty, length_test_penalty, offspring2)
+    calculate_fitness(metadata, fitness_function, num_tests_penalty,
+                      length_test_penalty, child1)
+    calculate_fitness(metadata, fitness_function, num_tests_penalty,
+                      length_test_penalty, child2)
 
-    return (offspring1, offspring2)
+    return child1, child2
+
 
 ###################################################################
-#Genetic Algorithm
+# Genetic Algorithm
 ###################################################################
 
 # Default parameters
 
 # Location of the metadata on the CUT
-metadata_location = "example/BMICalc_metadata.json" 
+metadata_location = "example/BMICalc_metadata.json"
 
 # Fitness function
-fitness_function = "statement" 
+fitness_function = "statement"
 
 # Maximum number of test cases in a generated suite
-max_test_cases = 20 
+max_test_cases = 20
 
 # Maximum number of actions in a generated test case
 max_actions = 20
@@ -265,7 +300,8 @@ crossover_operator = "uniform"
 # Tournament size
 tournament_size = 6
 
-# Exhaustion (number of generations before GA terminates due to lack of improvement)
+# Exhaustion (number of generations before GA terminates due to lack of
+# improvement)
 exhaustion = 30
 
 # Test suite size penalty
@@ -276,14 +312,26 @@ length_test_penalty = 30
 
 # Get command-line arguments
 try:
-    opts, args = getopt.getopt(sys.argv[1:],"hm:c:a:g:t:p:x:s:e:o:z:l:")
+    opts, args = getopt.getopt(sys.argv[1:], "hm:c:a:g:t:p:x:s:e:o:z:l:")
 except getopt.GetoptError:
-        print("genetic_algorithm.py -m <metadata file location> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size> -e <max generations before exhaustion> -o <crossover operator> -z <test suite size penalty> -l <test length penalty>")
-        sys.exit(2)
-													  		
+    print(
+        "genetic_algorithm.py -m <metadata file location> -c <maximum number of "
+        "test cases> -a <maximum number of actions> -g <maximum number of "
+        "generations> -p <population size> -t <mutation probability> -x "
+        "<crossover probability> -s <tournament size> -e <max generations "
+        "before exhaustion> -o <crossover operator> -z <test suite size "
+        "penalty> -l <test length penalty>")
+    sys.exit(2)
+
 for opt, arg in opts:
     if opt == "-h":
-        print("genetic_algorithm.py -m <metadata file location> -c <maximum number of test cases> -a <maximum number of actions> -g <maximum number of generations> -p <population size> -t <mutation probability> -x <crossover probability> -s <tournament size> -e <max generations before exhaustion> -o <crossover operator> -z <test suite size penalty> -l <test length penalty>")
+        print(
+            "genetic_algorithm.py -m <metadata file location> -c <maximum "
+            "number of test cases> -a <maximum number of actions> -g <maximum "
+            "number of generations> -p <population size> -t <mutation "
+            "probability> -x <crossover probability> -s <tournament size> -e "
+            "<max generations before exhaustion> -o <crossover operator> -z "
+            "<test suite size penalty> -l <test length penalty>")
         sys.exit()
     elif opt == "-m":
         metadata_location = arg
@@ -329,9 +377,10 @@ for opt, arg in opts:
             raise Exception("exhaustion cannot be < 1.")
     elif opt == "-o":
         crossover_operator = arg
- 
+
         if crossover_operator != "single" and crossover_operator != "uniform":
-            raise Exception("Crossover operator should be either 'single' or 'uniform'")
+            raise Exception(
+                "Crossover operator should be either 'single' or 'uniform'")
     elif opt == "-z":
         num_tests_penalty = int(arg)
 
@@ -342,7 +391,6 @@ for opt, arg in opts:
 
         if length_test_penalty < 1:
             raise Exception("length_test_penalty cannot be < 1.")
-
 
 # Import metadata.
 metadata = parse_metadata(metadata_location)
@@ -363,16 +411,19 @@ while gen <= max_gen and stagnation <= exhaustion:
     new_population = []
 
     while len(new_population) < len(population):
-        # Choose a subset of the population and identify the best solution in that subset (selection).
+        # Choose a subset of the population and identify the best solution in
+        # that subset (selection).
         offspring1 = selection(population, tournament_size)
         offspring2 = selection(population, tournament_size)
 
-        # Create new children by breeding elements of the best solutions (crossover)
+        # Create new children by breeding elements of the best solutions (
+        # crossover)
         if random.random() < crossover_probability:
             if crossover_operator == "single":
                 (offspring1, offspring2) = crossover(offspring1, offspring2)
             else:
-                (offspring1, offspring2) = uniform_crossover(offspring1, offspring2)
+                (offspring1, offspring2) = uniform_crossover(offspring1,
+                                                             offspring2)
 
         # Introduce a small, random change to the population (mutation).
         if random.random() < mutation_probability:
@@ -384,7 +435,8 @@ while gen <= max_gen and stagnation <= exhaustion:
         new_population.append(offspring1)
         new_population.append(offspring2)
 
-        # If either offspring is better than the best-seen solution, make it the new best.
+        # If either offspring is better than the best-seen solution, make it
+        # the new best.
         if offspring1.fitness > solution_best.fitness:
             solution_best = copy.deepcopy(offspring1)
             stagnation = -1
@@ -395,7 +447,11 @@ while gen <= max_gen and stagnation <= exhaustion:
     # Set the new population as the current population.
     population = new_population
 
-    print("Best fitness at generation %d: %.8f, number of tests: %d, average test length: %d" % (gen, solution_best.fitness, len(solution_best.test_suite), solution_best.average_length()))
+    print(
+        "Best fitness at generation %d: %.8f, number of tests: %d, average test "
+        "length: %d" % (
+            gen, solution_best.fitness, len(solution_best.test_suite),
+            solution_best.average_length()))
 
     # Increment the generation.
     gen += 1
